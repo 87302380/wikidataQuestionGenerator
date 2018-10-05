@@ -1,0 +1,902 @@
+{
+  "type": "item",
+  "id": "Q23",
+  "labels": {
+    "de": {
+      "language": "de",
+      "value": "George Washington"
+    }
+  },
+  "descriptions": {
+    "de": {
+      "language": "de",
+      "value": "erster Präsident der Vereinigten Staaten von Amerika"
+    }
+  },
+  "aliases": {
+    "de": [
+      {
+        "language": "de",
+        "value": "Präsident Washington"
+      },
+      {
+        "language": "de",
+        "value": "G. Washington"
+      }
+    ]
+  },
+  "claims": {
+    "P106": [
+      {
+        "rank": "preferred",
+        "references": [
+          {
+            "snaks": {
+              "P854": [
+                {
+                  "property": "P854",
+                  "datatype": "url",
+                  "datavalue": {
+                    "value": "http://www.britannica.com/blogs/2007/06/from-contemplative-man-to-flickering-man/",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P854"
+            ]
+          }
+        ],
+        "value": {
+          "value": {
+            "id": "Q82955",
+            "numeric-id": 82955,
+            "entity-type": "item"
+          },
+          "type": "wikibase-entityid"
+        },
+        "id": "q23$7F1176DF-B1EF-4B9D-9249-993D14D9AC4D",
+        "mainsnak": {
+          "property": "P106",
+          "datatype": "wikibase-item",
+          "datavalue": {
+            "value": {
+              "id": "Q82955",
+              "numeric-id": 82955,
+              "entity-type": "item"
+            },
+            "type": "wikibase-entityid"
+          },
+          "snaktype": "value"
+        },
+        "type": "statement"
+      },
+      {
+        "rank": "preferred",
+        "references": [
+          {
+            "snaks": {
+              "P854": [
+                {
+                  "property": "P854",
+                  "datatype": "url",
+                  "datavalue": {
+                    "value": "http://www.huffingtonpost.com/2014/09/03/port-authority-officer-bridge_n_5763230.html",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P854"
+            ]
+          },
+          {
+            "snaks": {
+              "P854": [
+                {
+                  "property": "P854",
+                  "datatype": "url",
+                  "datavalue": {
+                    "value": "http://www.nj.com/monmouth/index.ssf/2014/11/asbury_park_vfw_honors_police_officer_firefighter.html",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P854"
+            ]
+          }
+        ],
+        "value": {
+          "value": {
+            "id": "Q189290",
+            "numeric-id": 189290,
+            "entity-type": "item"
+          },
+          "type": "wikibase-entityid"
+        },
+        "id": "q23$212B925B-881F-4778-A2B5-302C9FBD9A41",
+        "mainsnak": {
+          "property": "P106",
+          "datatype": "wikibase-item",
+          "datavalue": {
+            "value": {
+              "id": "Q189290",
+              "numeric-id": 189290,
+              "entity-type": "item"
+            },
+            "type": "wikibase-entityid"
+          },
+          "snaktype": "value"
+        },
+        "type": "statement"
+      },
+      {
+        "rank": "normal",
+        "references": [
+          {
+            "snaks": {
+              "P854": [
+                {
+                  "property": "P854",
+                  "datatype": "url",
+                  "datavalue": {
+                    "value": "http://www.huffingtonpost.com/2013/01/08/washingtons-green-grocer-farmers-market_n_2426712.html",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P854"
+            ]
+          },
+          {
+            "snaks": {
+              "P143": [
+                {
+                  "property": "P143",
+                  "datatype": "wikibase-item",
+                  "datavalue": {
+                    "value": {
+                      "id": "Q207260",
+                      "numeric-id": 207260,
+                      "entity-type": "item"
+                    },
+                    "type": "wikibase-entityid"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P143"
+            ]
+          }
+        ],
+        "value": {
+          "value": {
+            "id": "Q131512",
+            "numeric-id": 131512,
+            "entity-type": "item"
+          },
+          "type": "wikibase-entityid"
+        },
+        "id": "Q23$7891ba2b-454a-b218-e48c-f08f1f8ce76d",
+        "mainsnak": {
+          "property": "P106",
+          "datatype": "wikibase-item",
+          "datavalue": {
+            "value": {
+              "id": "Q131512",
+              "numeric-id": 131512,
+              "entity-type": "item"
+            },
+            "type": "wikibase-entityid"
+          },
+          "snaktype": "value"
+        },
+        "type": "statement"
+      },
+      {
+        "rank": "normal",
+        "value": {
+          "value": {
+            "id": "Q1734662",
+            "numeric-id": 1734662,
+            "entity-type": "item"
+          },
+          "type": "wikibase-entityid"
+        },
+        "id": "Q23$3AE23BD2-7CDE-4B11-99D3-FA7133DE422D",
+        "mainsnak": {
+          "property": "P106",
+          "datatype": "wikibase-item",
+          "datavalue": {
+            "value": {
+              "id": "Q1734662",
+              "numeric-id": 1734662,
+              "entity-type": "item"
+            },
+            "type": "wikibase-entityid"
+          },
+          "snaktype": "value"
+        },
+        "type": "statement"
+      },
+      {
+        "rank": "normal",
+        "value": {
+          "value": {
+            "id": "Q294126",
+            "numeric-id": 294126,
+            "entity-type": "item"
+          },
+          "type": "wikibase-entityid"
+        },
+        "id": "Q23$4240dd5c-4f0a-4763-01e9-60179aed55fe",
+        "mainsnak": {
+          "property": "P106",
+          "datatype": "wikibase-item",
+          "datavalue": {
+            "value": {
+              "id": "Q294126",
+              "numeric-id": 294126,
+              "entity-type": "item"
+            },
+            "type": "wikibase-entityid"
+          },
+          "snaktype": "value"
+        },
+        "type": "statement"
+      },
+      {
+        "rank": "normal",
+        "value": {
+          "value": {
+            "id": "Q47064",
+            "numeric-id": 47064,
+            "entity-type": "item"
+          },
+          "type": "wikibase-entityid"
+        },
+        "id": "Q23$B1DAE8AE-100C-4F00-AA97-25B9F6BAF44D",
+        "mainsnak": {
+          "property": "P106",
+          "datatype": "wikibase-item",
+          "datavalue": {
+            "value": {
+              "id": "Q47064",
+              "numeric-id": 47064,
+              "entity-type": "item"
+            },
+            "type": "wikibase-entityid"
+          },
+          "snaktype": "value"
+        },
+        "type": "statement"
+      },
+      {
+        "rank": "normal",
+        "references": [
+          {
+            "snaks": {
+              "P854": [
+                {
+                  "property": "P854",
+                  "datatype": "url",
+                  "datavalue": {
+                    "value": "http://www.sfgate.com/cgi-bin/blogs/scavenger/detail?entry_id=62007&tsp=1",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P854"
+            ]
+          },
+          {
+            "snaks": {
+              "P854": [
+                {
+                  "property": "P854",
+                  "datatype": "url",
+                  "datavalue": {
+                    "value": "http://www.washingtonpost.com/blogs/style-blog/wp/2013/02/18/george-mason-professor-among-finalists-for-50000-history-prize/",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P854"
+            ]
+          },
+          {
+            "snaks": {
+              "P854": [
+                {
+                  "property": "P854",
+                  "datatype": "url",
+                  "datavalue": {
+                    "value": "http://www.nytimes.com/1989/12/29/world/after-noriega-burial-at-arlington-peruvian-kin-mourns-casualty-of-panama.html",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P854"
+            ]
+          }
+        ],
+        "value": {
+          "value": {
+            "id": "Q4991371",
+            "numeric-id": 4991371,
+            "entity-type": "item"
+          },
+          "type": "wikibase-entityid"
+        },
+        "id": "Q23$D2F511A3-3D1D-444A-A83B-E7F6D175C2DC",
+        "mainsnak": {
+          "property": "P106",
+          "datatype": "wikibase-item",
+          "datavalue": {
+            "value": {
+              "id": "Q4991371",
+              "numeric-id": 4991371,
+              "entity-type": "item"
+            },
+            "type": "wikibase-entityid"
+          },
+          "snaktype": "value"
+        },
+        "type": "statement"
+      },
+      {
+        "rank": "normal",
+        "value": {
+          "value": {
+            "id": "Q81096",
+            "numeric-id": 81096,
+            "entity-type": "item"
+          },
+          "type": "wikibase-entityid"
+        },
+        "id": "Q23$3C34814F-A8EB-4D8D-812F-2917B41ECADE",
+        "mainsnak": {
+          "property": "P106",
+          "datatype": "wikibase-item",
+          "datavalue": {
+            "value": {
+              "id": "Q81096",
+              "numeric-id": 81096,
+              "entity-type": "item"
+            },
+            "type": "wikibase-entityid"
+          },
+          "snaktype": "value"
+        },
+        "type": "statement"
+      },
+      {
+        "rank": "preferred",
+        "value": {
+          "value": {
+            "id": "Q372436",
+            "numeric-id": 372436,
+            "entity-type": "item"
+          },
+          "type": "wikibase-entityid"
+        },
+        "id": "Q23$04a504c1-4cf4-7897-3a56-7d16e23b57cc",
+        "mainsnak": {
+          "property": "P106",
+          "datatype": "wikibase-item",
+          "datavalue": {
+            "value": {
+              "id": "Q372436",
+              "numeric-id": 372436,
+              "entity-type": "item"
+            },
+            "type": "wikibase-entityid"
+          },
+          "snaktype": "value"
+        },
+        "type": "statement"
+      }
+    ],
+    "P18": [
+      {
+        "rank": "normal",
+        "references": [
+          {
+            "snaks": {
+              "P143": [
+                {
+                  "property": "P143",
+                  "datatype": "wikibase-item",
+                  "datavalue": {
+                    "value": {
+                      "id": "Q328",
+                      "numeric-id": 328,
+                      "entity-type": "item"
+                    },
+                    "type": "wikibase-entityid"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P143"
+            ]
+          }
+        ],
+        "value": {
+          "value": "Gilbert Stuart Williamstown Portrait of George Washington.jpg",
+          "type": "string"
+        },
+        "id": "q23$E3A2C72E-7FCE-4EF9-A851-7923749940D6",
+        "mainsnak": {
+          "property": "P18",
+          "datatype": "commonsMedia",
+          "datavalue": {
+            "value": "Gilbert Stuart Williamstown Portrait of George Washington.jpg",
+            "type": "string"
+          },
+          "snaktype": "value"
+        },
+        "qualifiers-order": [
+          "P2096"
+        ],
+        "type": "statement",
+        "qualifiers": {
+          "P2096": [
+            {
+              "property": "P2096",
+              "datatype": "monolingualtext",
+              "datavalue": {
+                "value": {
+                  "language": "es",
+                  "text": "El presidente Washington por [[Gilbert Stuart]]"
+                },
+                "type": "monolingualtext"
+              },
+              "snaktype": "value"
+            }
+          ]
+        }
+      }
+    ],
+    "P569": [
+      {
+        "rank": "normal",
+        "references": [
+          {
+            "snaks": {
+              "P248": [
+                {
+                  "property": "P248",
+                  "datatype": "wikibase-item",
+                  "datavalue": {
+                    "value": {
+                      "id": "Q36578",
+                      "numeric-id": 36578,
+                      "entity-type": "item"
+                    },
+                    "type": "wikibase-entityid"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P813": [
+                {
+                  "property": "P813",
+                  "datatype": "time",
+                  "datavalue": {
+                    "value": {
+                      "time": "+2014-04-09T00:00:00Z",
+                      "timezone": 0,
+                      "before": 0,
+                      "after": 0,
+                      "precision": 11,
+                      "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                    },
+                    "type": "time"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P248",
+              "P813"
+            ]
+          },
+          {
+            "snaks": {
+              "P854": [
+                {
+                  "property": "P854",
+                  "datatype": "url",
+                  "datavalue": {
+                    "value": "http://www.anb.org/articles/02/02-00332.html",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P854"
+            ]
+          },
+          {
+            "snaks": {
+              "P854": [
+                {
+                  "property": "P854",
+                  "datatype": "url",
+                  "datavalue": {
+                    "value": "http://cths.fr/an/prosopo.php?id=107557",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P2383": [
+                {
+                  "property": "P2383",
+                  "datatype": "external-id",
+                  "datavalue": {
+                    "value": "107557",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P248": [
+                {
+                  "property": "P248",
+                  "datatype": "wikibase-item",
+                  "datavalue": {
+                    "value": {
+                      "id": "Q2985434",
+                      "numeric-id": 2985434,
+                      "entity-type": "item"
+                    },
+                    "type": "wikibase-entityid"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P1476": [
+                {
+                  "property": "P1476",
+                  "datatype": "monolingualtext",
+                  "datavalue": {
+                    "value": {
+                      "language": "fr",
+                      "text": "George Washington"
+                    },
+                    "type": "monolingualtext"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P248",
+              "P854",
+              "P2383",
+              "P1476"
+            ]
+          },
+          {
+            "snaks": {
+              "P1810": [
+                {
+                  "property": "P1810",
+                  "datatype": "string",
+                  "datavalue": {
+                    "value": "George Washington",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P3430": [
+                {
+                  "property": "P3430",
+                  "datatype": "external-id",
+                  "datavalue": {
+                    "value": "w6028ps4",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P248": [
+                {
+                  "property": "P248",
+                  "datatype": "wikibase-item",
+                  "datavalue": {
+                    "value": {
+                      "id": "Q29861311",
+                      "numeric-id": 29861311,
+                      "entity-type": "item"
+                    },
+                    "type": "wikibase-entityid"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P813": [
+                {
+                  "property": "P813",
+                  "datatype": "time",
+                  "datavalue": {
+                    "value": {
+                      "time": "+2017-10-09T00:00:00Z",
+                      "timezone": 0,
+                      "before": 0,
+                      "after": 0,
+                      "precision": 11,
+                      "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                    },
+                    "type": "time"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P248",
+              "P3430",
+              "P1810",
+              "P813"
+            ]
+          },
+          {
+            "snaks": {
+              "P1810": [
+                {
+                  "property": "P1810",
+                  "datatype": "string",
+                  "datavalue": {
+                    "value": "George Washington",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P535": [
+                {
+                  "property": "P535",
+                  "datatype": "external-id",
+                  "datavalue": {
+                    "value": "1075",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P248": [
+                {
+                  "property": "P248",
+                  "datatype": "wikibase-item",
+                  "datavalue": {
+                    "value": {
+                      "id": "Q63056",
+                      "numeric-id": 63056,
+                      "entity-type": "item"
+                    },
+                    "type": "wikibase-entityid"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P813": [
+                {
+                  "property": "P813",
+                  "datatype": "time",
+                  "datavalue": {
+                    "value": {
+                      "time": "+2017-10-09T00:00:00Z",
+                      "timezone": 0,
+                      "before": 0,
+                      "after": 0,
+                      "precision": 11,
+                      "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                    },
+                    "type": "time"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P248",
+              "P535",
+              "P1810",
+              "P813"
+            ]
+          },
+          {
+            "snaks": {
+              "P1810": [
+                {
+                  "property": "P1810",
+                  "datatype": "string",
+                  "datavalue": {
+                    "value": "George Washington",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P535": [
+                {
+                  "property": "P535",
+                  "datatype": "external-id",
+                  "datavalue": {
+                    "value": "6781",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P248": [
+                {
+                  "property": "P248",
+                  "datatype": "wikibase-item",
+                  "datavalue": {
+                    "value": {
+                      "id": "Q63056",
+                      "numeric-id": 63056,
+                      "entity-type": "item"
+                    },
+                    "type": "wikibase-entityid"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P813": [
+                {
+                  "property": "P813",
+                  "datatype": "time",
+                  "datavalue": {
+                    "value": {
+                      "time": "+2017-10-09T00:00:00Z",
+                      "timezone": 0,
+                      "before": 0,
+                      "after": 0,
+                      "precision": 11,
+                      "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                    },
+                    "type": "time"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P248",
+              "P535",
+              "P1810",
+              "P813"
+            ]
+          },
+          {
+            "snaks": {
+              "P4638": [
+                {
+                  "property": "P4638",
+                  "datatype": "external-id",
+                  "datavalue": {
+                    "value": "p2570.htm#i25694",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P1810": [
+                {
+                  "property": "P1810",
+                  "datatype": "string",
+                  "datavalue": {
+                    "value": "George Washington",
+                    "type": "string"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P248": [
+                {
+                  "property": "P248",
+                  "datatype": "wikibase-item",
+                  "datavalue": {
+                    "value": {
+                      "id": "Q21401824",
+                      "numeric-id": 21401824,
+                      "entity-type": "item"
+                    },
+                    "type": "wikibase-entityid"
+                  },
+                  "snaktype": "value"
+                }
+              ],
+              "P813": [
+                {
+                  "property": "P813",
+                  "datatype": "time",
+                  "datavalue": {
+                    "value": {
+                      "time": "+2017-10-09T00:00:00Z",
+                      "timezone": 0,
+                      "before": 0,
+                      "after": 0,
+                      "precision": 11,
+                      "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                    },
+                    "type": "time"
+                  },
+                  "snaktype": "value"
+                }
+              ]
+            },
+            "snaks-order": [
+              "P248",
+              "P4638",
+              "P1810",
+              "P813"
+            ]
+          }
+        ],
+        "value": {
+          "value": {
+            "time": "+1732-02-22T00:00:00Z",
+            "timezone": 0,
+            "before": 0,
+            "after": 0,
+            "precision": 11,
+            "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+          },
+          "type": "time"
+        },
+        "id": "Q23$3BF0223A-D656-435B-9FD1-32E0B8F54A69",
+        "mainsnak": {
+          "property": "P569",
+          "datatype": "time",
+          "datavalue": {
+            "value": {
+              "time": "+1732-02-22T00:00:00Z",
+              "timezone": 0,
+              "before": 0,
+              "after": 0,
+              "precision": 11,
+              "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+            },
+            "type": "time"
+          },
+          "snaktype": "value"
+        },
+        "type": "statement"
+      }
+    ]
+  },
+  "sitelinks": {}
+}
