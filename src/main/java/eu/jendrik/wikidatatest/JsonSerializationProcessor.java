@@ -1,5 +1,7 @@
 package eu.jendrik.wikidatatest;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.wikidata.wdtk.datamodel.helpers.Datamodel;
 import org.wikidata.wdtk.datamodel.helpers.DatamodelConverter;
 import org.wikidata.wdtk.datamodel.helpers.DatamodelFilter;
@@ -16,16 +18,15 @@ import org.wikidata.wdtk.datamodel.interfaces.PropertyDocument;
 import org.wikidata.wdtk.datamodel.interfaces.PropertyIdValue;
 import org.wikidata.wdtk.datamodel.interfaces.Statement;
 import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
-import org.wikidata.wdtk.datamodel.interfaces.TimeValue;
 import org.wikidata.wdtk.datamodel.interfaces.Value;
 import org.wikidata.wdtk.datamodel.interfaces.ValueSnak;
-import org.wikidata.wdtk.dumpfiles.DumpContentType;
 import org.wikidata.wdtk.dumpfiles.DumpProcessingController;
 import org.wikidata.wdtk.dumpfiles.MwLocalDumpFile;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,16 +46,19 @@ import java.util.stream.Collectors;
  *
  * @author Markus Kroetzsch
  */
-public class JsonSerializationProcessor implements EntityDocumentProcessor {
+public class JsonSerializationProcessor implements EntityDocumentProcessor, AutoCloseable {
 	
-	private static final String OUTPUT_FILE_NAME = "output.json";
+	private static final String OUTPUT_FILE_NAME = "output-birthdates.json.bz2";
 	
-	private static final String DUMP_FILE = "./src/main/resources/firstlines.json.gz";
+	private static final String DUMP_FILE = "../wikidata-20181001-all.json.bz2";
+	
+	private static final BigInteger PRINT_INTERVAL = BigInteger.valueOf(10_000);
 	
 	private final JsonSerializer jsonSerializer;
 	
 	private final DatamodelFilter datamodelFilter;
 	
+	private BigInteger entitiesWithBirthDate = BigInteger.ZERO;
 	
 	/**
 	 * Constructor. Initializes various helper objects we use for the JSON
@@ -72,8 +76,6 @@ public class JsonSerializationProcessor implements EntityDocumentProcessor {
 		filter.setLanguageFilter(Collections.singleton("de"));
 		// Only copy statements of some properties:
 		Set<PropertyIdValue> propertyFilter = new HashSet<>();
-//		propertyFilter.add(Datamodel.makeWikidataPropertyIdValue("P18")); // image
-//		propertyFilter.add(Datamodel.makeWikidataPropertyIdValue("P106")); // occupation
 		propertyFilter.add(Datamodel.makeWikidataPropertyIdValue("P569")); // birthdate
 		filter.setPropertyFilter(propertyFilter);
 		// Do not copy any sitelinks:
@@ -97,35 +99,21 @@ public class JsonSerializationProcessor implements EntityDocumentProcessor {
 	 */
 	public static void main(String[] args) throws IOException {
 		IoHelpers.configureLogging();
-		JsonSerializationProcessor.printDocumentation();
 		
-		JsonSerializationProcessor jsonSerializationProcessor = new JsonSerializationProcessor();
-		DumpProcessingController dumpProcessingController = new DumpProcessingController("wikidatawiki");
-		dumpProcessingController.registerEntityDocumentProcessor(jsonSerializationProcessor, null, true);
-		
-		MwLocalDumpFile mwDumpFile = new MwLocalDumpFile(DUMP_FILE, DumpContentType.JSON, "20181004", null);
-		dumpProcessingController.processDump(mwDumpFile);
-		jsonSerializationProcessor.close();
-	}
-	
-	/**
-	 * Prints some basic documentation about this program.
-	 */
-	private static void printDocumentation() {
-		System.out.println("********************************************************************");
-		System.out.println("*** Wikidata Toolkit: JsonSerializationProcessor");
-		System.out.println("*** ");
-		System.out.println("*** This program will download and process dumps from Wikidata.");
-		System.out.println("*** It will filter the data and store the results in a new JSON file.");
-		System.out.println("*** See source code for further details.");
-		System.out.println("********************************************************************");
+		try (JsonSerializationProcessor jsonSerializationProcessor = new JsonSerializationProcessor()) {
+			DumpProcessingController dumpProcessingController = new DumpProcessingController("wikidatawiki");
+			dumpProcessingController.registerEntityDocumentProcessor(jsonSerializationProcessor, null, true);
+			
+			MwLocalDumpFile mwDumpFile = new Bzip2DumpFile(DUMP_FILE);
+			dumpProcessingController.processDump(mwDumpFile);
+		}
 	}
 	
 	/**
 	 * Closes the output. Should be called after the JSON serialization was
 	 * finished.
 	 */
-	private void close() {
+	public void close() {
 		System.out.println("Serialized "
 		                   + this.jsonSerializer.getEntityDocumentCount()
 		                   + " item documents to JSON file " + OUTPUT_FILE_NAME + ".");
@@ -135,6 +123,7 @@ public class JsonSerializationProcessor implements EntityDocumentProcessor {
 	@Override
 	public void processItemDocument(ItemDocument itemDocument) {
 		if (includeDocument(itemDocument)) {
+			entitiesWithBirthDate = entitiesWithBirthDate.add(BigInteger.ONE);
 			
 			// remove unneeded properties
 			itemDocument = this.datamodelFilter.filter(itemDocument);
@@ -165,9 +154,8 @@ public class JsonSerializationProcessor implements EntityDocumentProcessor {
 					0
 			);
 			
-			TimeValue birthDate = itemDocument.findStatementTimeValue("P569");
-			if (birthDate != null) {
-				System.out.println(itemDocument.findLabel("de") + ": " + birthDate.getYear());
+			if (entitiesWithBirthDate.mod(PRINT_INTERVAL).equals(BigInteger.ZERO)) {
+				Logger.getLogger(getClass()).log(Level.INFO, "found " + entitiesWithBirthDate + " entities");
 			}
 			
 			this.jsonSerializer.processItemDocument(itemDocument);
