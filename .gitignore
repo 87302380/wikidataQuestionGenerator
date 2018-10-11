@@ -2,4 +2,4 @@
 /target/
 /results/
 *.iml
-/resources/
+/src/main/resources/
