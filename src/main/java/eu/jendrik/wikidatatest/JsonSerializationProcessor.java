@@ -1,6 +1,5 @@
 package eu.jendrik.wikidatatest;
 
-import org.wikidata.wdtk.datamodel.helpers.Datamodel;
 import org.wikidata.wdtk.datamodel.helpers.DatamodelConverter;
 import org.wikidata.wdtk.datamodel.helpers.DatamodelFilter;
 import org.wikidata.wdtk.datamodel.helpers.JsonSerializer;
@@ -13,10 +12,8 @@ import org.wikidata.wdtk.datamodel.interfaces.EntityDocumentProcessor;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
 import org.wikidata.wdtk.datamodel.interfaces.PropertyDocument;
-import org.wikidata.wdtk.datamodel.interfaces.PropertyIdValue;
 import org.wikidata.wdtk.datamodel.interfaces.Statement;
 import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
-import org.wikidata.wdtk.datamodel.interfaces.TimeValue;
 import org.wikidata.wdtk.datamodel.interfaces.Value;
 import org.wikidata.wdtk.datamodel.interfaces.ValueSnak;
 import org.wikidata.wdtk.dumpfiles.DumpContentType;
@@ -27,12 +24,8 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * This example illustrates how to create a JSON serialization of some of the
@@ -71,11 +64,11 @@ public class JsonSerializationProcessor implements EntityDocumentProcessor {
 		// Only copy English labels, descriptions, and aliases:
 		filter.setLanguageFilter(Collections.singleton("de"));
 		// Only copy statements of some properties:
-		Set<PropertyIdValue> propertyFilter = new HashSet<>();
+//		Set<PropertyIdValue> propertyFilter = new HashSet<>();
 //		propertyFilter.add(Datamodel.makeWikidataPropertyIdValue("P18")); // image
 //		propertyFilter.add(Datamodel.makeWikidataPropertyIdValue("P106")); // occupation
-		propertyFilter.add(Datamodel.makeWikidataPropertyIdValue("P569")); // birthdate
-		filter.setPropertyFilter(propertyFilter);
+//		propertyFilter.add(Datamodel.makeWikidataPropertyIdValue("P569")); // birthdate
+//		filter.setPropertyFilter(propertyFilter);
 		// Do not copy any sitelinks:
 		filter.setSiteLinkFilter(Collections.emptySet());
 		
@@ -158,17 +151,12 @@ public class JsonSerializationProcessor implements EntityDocumentProcessor {
 			itemDocument = new ItemDocumentImpl(
 					itemDocument.getEntityId(),
 					new ArrayList<>(itemDocument.getLabels().values()),
-					new ArrayList<>(itemDocument.getDescriptions().values()),
-					itemDocument.getAliases().values().stream().flatMap(Collection::stream).collect(Collectors.toList()),
+					Collections.emptyList(),
+					Collections.emptyList(),
 					newStatementGroups,
 					Collections.emptyList(),
 					0
 			);
-			
-			TimeValue birthDate = itemDocument.findStatementTimeValue("P569");
-			if (birthDate != null) {
-				System.out.println(itemDocument.findLabel("de") + ": " + birthDate.getYear());
-			}
 			
 			this.jsonSerializer.processItemDocument(itemDocument);
 		}
@@ -197,7 +185,7 @@ public class JsonSerializationProcessor implements EntityDocumentProcessor {
 				if (s.getClaim().getMainSnak() instanceof ValueSnak) {
 					Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
 					// "Q5" is "human" on Wikidata
-					if (v instanceof ItemIdValue && ((ItemIdValue) v).getId().equals("Q5")) {
+					if (v instanceof ItemIdValue && ((ItemIdValue) v).getId().equals("Q235557")) {
 						return true;
 					}
 				}
