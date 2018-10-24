@@ -1,4 +1,4 @@
-package eu.jendrik.wikidatatest;
+package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
 /*
  * #%L

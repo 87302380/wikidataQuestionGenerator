@@ -1,4 +1,4 @@
-package eu.jendrik.wikidatatest;
+package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.wikidata.wdtk.datamodel.implementation.StatementImpl;
@@ -14,7 +14,7 @@ import org.wikidata.wdtk.datamodel.interfaces.Value;
  */
 public class CorrectSerializeStatement extends StatementImpl {
 	
-	CorrectSerializeStatement(Statement s) {
+	public CorrectSerializeStatement(Statement s) {
 		super(s.getStatementId(), s.getRank(), s.getMainSnak(), s.getQualifiers(), s.getReferences(), s.getSubject());
 	}
 	
