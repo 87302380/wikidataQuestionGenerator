@@ -4,3 +4,6 @@
 *.iml
 /src/main/resources/*.json
 /src/main/resources/*.gz
+/src/main/resources/*.bz2
+/src/main/resources/*.zip
+/src/main/resources/*.txt
