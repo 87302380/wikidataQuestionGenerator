@@ -8,7 +8,6 @@ import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
 import org.wikidata.wdtk.datamodel.interfaces.Value;
 import org.wikidata.wdtk.datamodel.interfaces.ValueSnak;
 
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,8 +18,8 @@ import java.util.logging.Logger;
 
 public class PokemonTypeQuestion implements QuestionType {
 	
-	private static final Logger                   LOGGER        = Logger.getLogger(PokemonTypeQuestion.class.getName());
-	private static       Map<String, Set<String>> pokemonByType = new HashMap<>();
+	private static final Logger LOGGER = Logger.getLogger(PokemonTypeQuestion.class.getName());
+	private static Map<String, Set<String>> pokemonByType = new HashMap<>();
 	
 	public PokemonTypeQuestion() {
 		if (pokemonByType.isEmpty()) {
@@ -37,13 +36,12 @@ public class PokemonTypeQuestion implements QuestionType {
 	
 	@Override public boolean itemRelevant(final ItemDocument itemDocument) {
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
-			// subclass of
-			if (sg.getProperty().getId().equals("P279")) {
+			if (sg.getProperty().getId().equals("P31")) {
 				for (Statement s : sg.getStatements()) {
 					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
 						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
-						// "Q3966183" is "pokemon species" on Wikidata
 						if (v instanceof ItemIdValue && pokemonByType.containsKey(((ItemIdValue) v).getId())) {
+							LOGGER.log(Level.INFO, itemDocument.getLabels().get("de").getText() + ": " + ((ItemIdValue) v).getId());
 							return true;
 						}
 					}
@@ -55,8 +53,7 @@ public class PokemonTypeQuestion implements QuestionType {
 	
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
-			// subclass of
-			if (sg.getProperty().getId().equals("P279")) {
+			if (sg.getProperty().getId().equals("P31")) {
 				for (Statement s : sg.getStatements()) {
 					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
 						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
