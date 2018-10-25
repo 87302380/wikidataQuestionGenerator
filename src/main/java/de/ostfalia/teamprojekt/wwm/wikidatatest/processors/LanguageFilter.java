@@ -24,8 +24,8 @@ public class LanguageFilter implements EntityDocumentProcessor {
 		this.datamodelFilter = new DatamodelFilter(new DataObjectFactoryImpl(), filter);
 	}
 	
-	@Override public void processItemDocument(final ItemDocument itemDocument) {
-		datamodelFilter.filter(itemDocument);
+	@Override public void processItemDocument(ItemDocument itemDocument) {
+		itemDocument = datamodelFilter.filter(itemDocument);
 		next.processItemDocument(itemDocument);
 	}
 	
