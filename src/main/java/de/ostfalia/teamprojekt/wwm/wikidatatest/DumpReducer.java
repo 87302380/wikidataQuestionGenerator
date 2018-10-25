@@ -17,7 +17,9 @@ public class DumpReducer implements AutoCloseable {
 	
 	private final DumpReader reader;
 	private final DumpWriter writer;
-	
+
+	//TODO write a method to prefilter all irrelevant Data that are never needed e.g.referrences or links
+
 	/**
 	 * Constructor. Initializes various helper objects we use for the JSON
 	 * serialization, and opens the file that we want to write to.
