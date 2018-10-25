@@ -22,9 +22,9 @@ public class PokemonTypeQuestion implements QuestionType {
 	private static final Logger                   LOGGER        = Logger.getLogger(PokemonTypeQuestion.class.getName());
 	private static       Map<String, Set<String>> pokemonByType = new HashMap<>();
 	
-	public PokemonTypeQuestion() throws FileNotFoundException {
+	public PokemonTypeQuestion() {
 		if (pokemonByType.isEmpty()) {
-			try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream("pokemontypes.csv"))) {
+			try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream("pokemontypes.csv"), "UTF-8")) {
 				s.useDelimiter(",");
 				s.nextLine(); // skip first line
 				while (s.hasNext()) {
