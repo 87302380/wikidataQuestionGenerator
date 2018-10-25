@@ -1,6 +1,5 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
-import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.LanguageFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.PredicateItemFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.StatementCleaner;
@@ -8,11 +7,11 @@ import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonTypeQuestion;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.QuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestionType;
 import org.wikidata.wdtk.datamodel.interfaces.EntityDocumentProcessor;
-import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 
 import java.io.IOException;
 
 public class DumpReducer implements AutoCloseable {
+
 	private static final String INPUT_FILE_NAME  = "src/main/resources/wikidata-20181001-all.json.bz2";
 	
 	private final DumpReader reader;
@@ -29,21 +28,21 @@ public class DumpReducer implements AutoCloseable {
 	 */
 	private DumpReducer(String arg) throws IOException {
 		QuestionType q;
-		String output_file_name;
+		String outputFileName;
 		switch (arg) {
 			case "pokemon":
 				q = new PokemonTypeQuestion();
-				output_file_name = "pokemon.json";
+				outputFileName = "pokemon.json";
 				break;
 			case "borders":
 				q = new SharedBordersQuestionType();
-				output_file_name = "borders.json";
+				outputFileName = "borders.json";
 				break;
 			default:
 				throw new IllegalArgumentException("Bitte Argument übergeben!");
 		}
 
-		this.writer = new DumpWriter(output_file_name);
+		this.writer = new DumpWriter(outputFileName);
 		EntityDocumentProcessor processor =
 				new PredicateItemFilter(
 						new LanguageFilter(
