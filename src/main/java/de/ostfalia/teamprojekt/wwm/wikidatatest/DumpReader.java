@@ -83,7 +83,7 @@ public class DumpReader {
 		
 		Bzip2DumpFile(String fileName) {
 			super(fileName);
-			DirectoryManager tmp = null;
+			DirectoryManager tmp;
 			// create a DirectoryManager the same way super does. Should not throw an exception.
 			try {
 				tmp = DirectoryManagerFactory.createDirectoryManager(getPath().getParent(), true);
