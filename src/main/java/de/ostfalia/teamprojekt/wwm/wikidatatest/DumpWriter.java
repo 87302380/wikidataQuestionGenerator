@@ -19,6 +19,7 @@ public class DumpWriter implements EntityDocumentProcessor, AutoCloseable {
 		OutputStream out = new BufferedOutputStream(IoHelpers.openExampleFileOuputStream(filename));
 		this.filename = filename;
 		this.jsonSerializer = new JsonSerializer(out);
+		this.jsonSerializer.open();
 	}
 	
 	public void serialize(ItemDocument itemDocument) {
