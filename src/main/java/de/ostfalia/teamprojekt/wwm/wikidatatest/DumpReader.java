@@ -87,7 +87,9 @@ public class DumpReader {
 			// create a DirectoryManager the same way super does. Should not throw an exception.
 			try {
 				tmp = DirectoryManagerFactory.createDirectoryManager(getPath().getParent(), true);
-			} catch (IOException ignored) {}
+			} catch (IOException e) {
+				throw new IllegalStateException(e);
+			}
 			directoryManager = tmp;
 		}
 		
