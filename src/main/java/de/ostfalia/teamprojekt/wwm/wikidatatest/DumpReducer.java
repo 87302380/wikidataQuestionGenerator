@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class DumpReducer implements AutoCloseable {
 
-	private static final String INPUT_FILE_NAME  = "src/main/resources/wikidata-20181001-all.json.bz2";
+	private static final String INPUT_FILE_NAME  = "wikidata-20181001-all.json.bz2";
 	
 	private final DumpReader reader;
 	private final DumpWriter writer;
