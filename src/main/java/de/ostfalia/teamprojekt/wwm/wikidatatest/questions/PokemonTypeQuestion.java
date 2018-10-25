@@ -8,7 +8,6 @@ import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
 import org.wikidata.wdtk.datamodel.interfaces.Value;
 import org.wikidata.wdtk.datamodel.interfaces.ValueSnak;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,7 +24,7 @@ public class PokemonTypeQuestion implements QuestionType {
 	
 	public PokemonTypeQuestion() throws FileNotFoundException {
 		if (pokemonByType.isEmpty()) {
-			try (Scanner s = new Scanner(new FileInputStream("pokemontypes.csv"))) {
+			try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream("pokemontypes.csv"))) {
 				s.useDelimiter(",");
 				s.nextLine(); // skip first line
 				while (s.hasNext()) {
