@@ -77,7 +77,7 @@ public class DumpReader {
 	
 	
 	
-	public class Bzip2DumpFile extends MwLocalDumpFile {
+	public static class Bzip2DumpFile extends MwLocalDumpFile {
 		
 		final DirectoryManager directoryManager;
 		
