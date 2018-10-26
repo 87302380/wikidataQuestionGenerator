@@ -17,10 +17,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PokemonTypeQuestion implements QuestionType {
-	
+
 	private static final Logger LOGGER = Logger.getLogger(PokemonTypeQuestion.class.getName());
 	private static Map<String, Set<String>> pokemonByType = new HashMap<>();
-	
+
 	public PokemonTypeQuestion() {
 		if (pokemonByType.isEmpty()) {
 			try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream("pokemontypes.csv"), "UTF-8")) {
@@ -33,7 +33,7 @@ public class PokemonTypeQuestion implements QuestionType {
 			}
 		}
 	}
-	
+
 	@Override public boolean itemRelevant(final ItemDocument itemDocument) {
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
 			if (sg.getProperty().getId().equals("P31")) {
@@ -41,7 +41,9 @@ public class PokemonTypeQuestion implements QuestionType {
 					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
 						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
 						if (v instanceof ItemIdValue && pokemonByType.containsKey(((ItemIdValue) v).getId())) {
-							LOGGER.log(Level.INFO, itemDocument.getLabels().get("de").getText() + ": " + ((ItemIdValue) v).getId());
+							// german label might not exist
+							//LOGGER.log(Level.INFO, itemDocument.getLabels().get("de").getText() + ": " + ((ItemIdValue) v).getId());
+							LOGGER.log(Level.INFO, itemDocument.getEntityId().getId() + " is of type " + ((ItemIdValue) v).getId());
 							return true;
 						}
 					}
@@ -50,7 +52,7 @@ public class PokemonTypeQuestion implements QuestionType {
 		}
 		return false;
 	}
-	
+
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
 			if (sg.getProperty().getId().equals("P31")) {
@@ -67,11 +69,11 @@ public class PokemonTypeQuestion implements QuestionType {
 			}
 		}
 	}
-	
+
 	@Override public boolean hasNext() {
 		return false;
 	}
-	
+
 	@Override public Question next() {
 		return null;
 	}
