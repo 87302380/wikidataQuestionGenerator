@@ -1,6 +1,8 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest.processors;
 
 import de.ostfalia.teamprojekt.wwm.wikidatatest.CorrectSerializeStatement;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.wikidata.wdtk.datamodel.helpers.StatementBuilder;
 import org.wikidata.wdtk.datamodel.implementation.ItemDocumentImpl;
 import org.wikidata.wdtk.datamodel.implementation.StatementGroupImpl;
@@ -20,13 +22,13 @@ import java.util.Objects;
  * Removes qualifiers and references from Statements.
  */
 public class StatementCleaner implements EntityDocumentProcessor {
-	
+
 	private final EntityDocumentProcessor next;
-	
+
 	public StatementCleaner(EntityDocumentProcessor next) {
 		this.next = Objects.requireNonNull(next);
 	}
-	
+
 	@Override public void processItemDocument(ItemDocument itemDocument) {
 		// create new statement groups, because we have to change the statements (remove the references and qualifiers)
 		List<StatementGroup> newStatementGroups = new ArrayList<>();
@@ -34,15 +36,24 @@ public class StatementCleaner implements EntityDocumentProcessor {
 			List<Statement> newStatements = new ArrayList<>();
 			for (final Statement s : sg.getStatements()) {
 				// create a new statement with the same value, but ignore the rest
-				Statement newS = StatementBuilder.forSubjectAndProperty(itemDocument.getEntityId(), s.getMainSnak().getPropertyId())
-				                                 .withValue(s.getValue())
-				                                 .build();
+				// not all kinds of values can be build (todo: investigate why)
+				Statement newS;
+				try {
+					newS = StatementBuilder.forSubjectAndProperty(itemDocument.getEntityId(), s.getMainSnak().getPropertyId())
+					                       .withValue(s.getValue())
+					                       .build();
+				} catch (UnsupportedOperationException e) {
+					Logger.getLogger(getClass()).log(Level.WARN, "could not create a Statement with a value of type " + s.getValue().getClass(), e);
+					continue;
+				}
 				newS = new CorrectSerializeStatement(newS);
 				newStatements.add(newS);
 			}
-			newStatementGroups.add(new StatementGroupImpl(newStatements));
+			if (!newStatements.isEmpty()) {
+				newStatementGroups.add(new StatementGroupImpl(newStatements));
+			}
 		}
-		
+
 		// create a new item document with the nwe statement groups
 		itemDocument = new ItemDocumentImpl(
 				itemDocument.getEntityId(),
@@ -53,14 +64,14 @@ public class StatementCleaner implements EntityDocumentProcessor {
 				Collections.emptyList(),
 				0
 		);
-		
+
 		next.processItemDocument(itemDocument);
 	}
-	
+
 	@Override public void processPropertyDocument(final PropertyDocument propertyDocument) {
 		next.processPropertyDocument(propertyDocument);
 	}
-	
+
 	@Override public void processLexemeDocument(final LexemeDocument lexemeDocument) {
 		next.processLexemeDocument(lexemeDocument);
 	}
