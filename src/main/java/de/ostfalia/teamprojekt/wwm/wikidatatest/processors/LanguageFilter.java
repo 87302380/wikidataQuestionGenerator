@@ -13,13 +13,14 @@ import java.util.Objects;
 
 public class LanguageFilter implements EntityDocumentProcessor {
 
+	private static final String LANGUAGE = "de";
 	private final DatamodelFilter datamodelFilter;
 	private final EntityDocumentProcessor next;
 
 	public LanguageFilter(EntityDocumentProcessor next) {
 		this.next = Objects.requireNonNull(next);
 		DocumentDataFilter filter = new DocumentDataFilter();
-		filter.setLanguageFilter(Collections.singleton("de"));
+		filter.setLanguageFilter(Collections.singleton(LANGUAGE));
 		filter.setSiteLinkFilter(Collections.emptySet());
 		this.datamodelFilter = new DatamodelFilter(new DataObjectFactoryImpl(), filter);
 	}
@@ -27,7 +28,7 @@ public class LanguageFilter implements EntityDocumentProcessor {
 	@Override public void processItemDocument(ItemDocument itemDocument) {
 		itemDocument = datamodelFilter.filter(itemDocument);
 		// it may be possible that no german label is given. in that case the item should be ignored
-		if (itemDocument.findLabel("de") != null) {
+		if (itemDocument.findLabel(LANGUAGE) != null) {
 			next.processItemDocument(itemDocument);
 		}
 	}
