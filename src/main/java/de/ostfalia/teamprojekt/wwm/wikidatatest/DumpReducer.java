@@ -47,7 +47,7 @@ public class DumpReducer implements AutoCloseable {
 				break;
 			case "general":
 				predicate = this::generalFilter;
-				outputFileName = "reduced.json";
+				outputFileName = "reduced.json.gz";
 				break;
 			default:
 				throw new IllegalArgumentException("Bitte Argument übergeben!");
