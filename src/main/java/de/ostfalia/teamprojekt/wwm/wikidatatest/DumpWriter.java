@@ -1,5 +1,6 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 import org.wikidata.wdtk.datamodel.helpers.JsonSerializer;
 import org.wikidata.wdtk.datamodel.interfaces.EntityDocumentProcessor;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
@@ -15,6 +16,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.zip.GZIPOutputStream;
 
 public class DumpWriter implements EntityDocumentProcessor, AutoCloseable {
 
@@ -28,6 +30,11 @@ public class DumpWriter implements EntityDocumentProcessor, AutoCloseable {
 
 	public DumpWriter(final String filename) throws IOException {
 		OutputStream out = new BufferedOutputStream(openExampleFileOuputStream(filename));
+		if (filename.endsWith(".gz")) {
+			out = new GZIPOutputStream(out);
+		} else if (filename.endsWith(".bz2")) {
+			out = new BZip2CompressorOutputStream(out);
+		}
 		this.filename = filename;
 		this.jsonSerializer = new JsonSerializer(out);
 		this.jsonSerializer.open();
