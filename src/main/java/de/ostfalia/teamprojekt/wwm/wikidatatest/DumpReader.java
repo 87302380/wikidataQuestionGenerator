@@ -1,5 +1,7 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wikidata.wdtk.datamodel.interfaces.EntityDocumentProcessor;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.LexemeDocument;
@@ -12,11 +14,10 @@ import org.wikidata.wdtk.util.DirectoryManagerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DumpReader {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(DumpReader.class);
 	private final DumpProcessingController dumpProcessingController;
 	private final MwLocalDumpFile dumpFile;
 
@@ -47,7 +48,7 @@ public class DumpReader {
 		@Override public void processItemDocument(final ItemDocument itemDocument) {
 			count++;
 			if (count % 10_000 == 0) {
-				Logger.getLogger(getClass().getSimpleName()).log(Level.INFO, count + " items processed");
+				LOGGER.info(count + " items processed");
 			}
 			next.processItemDocument(itemDocument);
 		}
