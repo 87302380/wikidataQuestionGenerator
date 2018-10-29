@@ -1,6 +1,8 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
 import org.wikidata.wdtk.datamodel.interfaces.Statement;
@@ -13,12 +15,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class PokemonTypeQuestion implements QuestionType {
 
-	private static final Logger LOGGER = Logger.getLogger(PokemonTypeQuestion.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(PokemonTypeQuestion.class);
 	private static Map<String, Set<String>> pokemonByType = new HashMap<>();
 
 	public PokemonTypeQuestion() {
@@ -43,7 +43,7 @@ public class PokemonTypeQuestion implements QuestionType {
 						if (v instanceof ItemIdValue && pokemonByType.containsKey(((ItemIdValue) v).getId())) {
 							// german label might not exist
 							//LOGGER.log(Level.INFO, itemDocument.getLabels().get("de").getText() + ": " + ((ItemIdValue) v).getId());
-							LOGGER.log(Level.INFO, itemDocument.getEntityId().getId() + " is of type " + ((ItemIdValue) v).getId());
+							LOGGER.info(itemDocument.getEntityId().getId() + " is of type " + ((ItemIdValue) v).getId());
 							return true;
 						}
 					}
@@ -62,7 +62,7 @@ public class PokemonTypeQuestion implements QuestionType {
 						if (v instanceof ItemIdValue) {
 							String pokemonTypeId = ((ItemIdValue) v).getId();
 							pokemonByType.get(pokemonTypeId).add(itemDocument.getLabels().get("de").getText());
-							LOGGER.log(Level.INFO, itemDocument.getLabels().get("de").getText() + ": " + pokemonTypeId);
+							LOGGER.info(itemDocument.getLabels().get("de").getText() + ": " + pokemonTypeId);
 						}
 					}
 				}

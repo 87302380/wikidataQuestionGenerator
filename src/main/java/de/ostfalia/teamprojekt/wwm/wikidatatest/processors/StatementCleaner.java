@@ -1,8 +1,8 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest.processors;
 
 import de.ostfalia.teamprojekt.wwm.wikidatatest.CorrectSerializeStatement;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wikidata.wdtk.datamodel.helpers.StatementBuilder;
 import org.wikidata.wdtk.datamodel.implementation.ItemDocumentImpl;
 import org.wikidata.wdtk.datamodel.implementation.StatementGroupImpl;
@@ -23,6 +23,7 @@ import java.util.Objects;
  */
 public class StatementCleaner implements EntityDocumentProcessor {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(StatementCleaner.class);
 	private final EntityDocumentProcessor next;
 
 	public StatementCleaner(EntityDocumentProcessor next) {
@@ -43,7 +44,7 @@ public class StatementCleaner implements EntityDocumentProcessor {
 					                       .withValue(s.getValue())
 					                       .build();
 				} catch (UnsupportedOperationException e) {
-					Logger.getLogger(getClass()).log(Level.WARN, "could not create a Statement with a value of type " + s.getValue().getClass(), e);
+					LOGGER.warn("could not create a Statement with a value of type " + s.getValue().getClass(), e);
 					continue;
 				}
 				newS = new CorrectSerializeStatement(newS);
