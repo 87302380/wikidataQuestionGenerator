@@ -19,7 +19,8 @@ import java.util.function.Predicate;
 
 public class DumpReducer implements AutoCloseable {
 
-	private static final String INPUT_FILE_NAME = "/media/leichen/DAA6F84CA6F82AA1/wikidata-20181001-all.json.gz";
+	private static final String INPUT_FILE_NAME = "results/reduced.json.gz"/*"wikidata-20181001-all.json.bz2" */;//TODO think about an optional parameter for full Dump
+
 
 	private final DumpReader reader;
 	private final DumpWriter writer;
@@ -49,8 +50,10 @@ public class DumpReducer implements AutoCloseable {
 				outputFileName = "maerchenFigur.json";
 				break;
 			case "general":
-				predicate = this::generalFilter;
-				outputFileName = "reduced.json.gz";
+
+				predicate = DumpReducer::generalFilter;
+				outputFileName = "reduced2.json.gz";
+				
 				break;
 			default:
 				throw new IllegalArgumentException("Bitte Argument übergeben!");
@@ -85,7 +88,7 @@ public class DumpReducer implements AutoCloseable {
 		reader.start();
 	}
 
-	private boolean generalFilter(final ItemDocument itemDocument) {
+	private static boolean generalFilter(final ItemDocument itemDocument) {
 		// ignore scholarly articles
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
 			if (sg.getProperty().getId().equals("P31")) {
