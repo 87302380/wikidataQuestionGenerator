@@ -1,61 +1,62 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
-import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.LanguageFilter;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.PredicateItemFilter;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.StatementCleaner;
-import org.wikidata.wdtk.datamodel.interfaces.EntityDocumentProcessor;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonTypeQuestion;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.QuestionType;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestionType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.util.stream.Stream;
 
-public class Main implements AutoCloseable {
-	
-	private static final String OUTPUT_FILE_NAME = "output.json";
-	private static final String INPUT_FILE_NAME  = "./src/main/resources/firstlines.json.gz";
-	
+public class Main {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 	private final DumpReader reader;
-	private final DumpWriter writer;
-	
+	private final QuestionType questionType;
+
 	/**
 	 * Constructor. Initializes various helper objects we use for the JSON
 	 * serialization, and opens the file that we want to write to.
-	 *
-	 * @throws IOException if there is a problem opening the output file
 	 */
-	private Main() throws IOException {
-		EntityDocumentProcessor processor =
-				new PredicateItemFilter(
-						new LanguageFilter(
-								new StatementCleaner(/*TODO: insert real processor here*/null)
-						), item -> true
-				);
-		
-		this.reader = new DumpReader(INPUT_FILE_NAME, processor);
-		this.writer = new DumpWriter(OUTPUT_FILE_NAME);
+	private Main(String argument) {
+		String inputFileName;
+
+		switch (argument) {
+			case "pokemon":
+				questionType = new PokemonTypeQuestion();
+				inputFileName = "pokemon.json";
+				break;
+			case "borders":
+				questionType = new SharedBordersQuestionType();
+				inputFileName = "borders.json";
+				break;
+			default:
+				throw new IllegalArgumentException("Bitte Argument übergeben!");
+		}
+
+		this.reader = new DumpReader("results/" + inputFileName, questionType);
 	}
-	
+
 	/**
 	 * Runs the example program.
 	 *
-	 * @throws IOException if there was a problem in writing the output file
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		IoHelpers.configureLogging();
-		
-		try (Main main = new Main()) {
-			main.start();
+
+		if (args.length < 1) {
+			LOGGER.error("no argument given");
+			System.exit(1);
 		}
+		Main main = new Main(args[0]);
+		main.start();
 	}
-	
+
 	public void start() {
 		reader.start();
+		Stream<Question> questions = questionType.generateQuestions();
+		questions.limit(10).forEach(System.out::println);
 	}
-	
-	/**
-	 * Closes the output. Should be called after the JSON serialization was
-	 * finished.
-	 */
-	@Override public void close() {
-		writer.close();
-	}
-	
+
 }

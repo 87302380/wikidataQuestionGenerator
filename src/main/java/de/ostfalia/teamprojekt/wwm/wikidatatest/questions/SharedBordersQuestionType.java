@@ -3,6 +3,8 @@ package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
 import org.wikidata.wdtk.datamodel.interfaces.*;
 
+import java.util.stream.Stream;
+
 
 /**
  *
@@ -41,13 +43,8 @@ public class SharedBordersQuestionType implements QuestionType {
 		return false;
 	}
 
-	@Override
-	public boolean hasNext() {
-		return false;
+	@Override public Stream<Question> generateQuestions() {
+		return Stream.empty();
 	}
 
-	@Override
-	public Question next() {
-		return null;
-	}
 }
