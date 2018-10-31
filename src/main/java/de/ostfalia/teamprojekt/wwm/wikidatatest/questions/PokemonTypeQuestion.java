@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class PokemonTypeQuestion implements QuestionType {
 
@@ -53,6 +54,10 @@ public class PokemonTypeQuestion implements QuestionType {
 		return false;
 	}
 
+	@Override public Stream<Question> generateQuestions() {
+		return Stream.empty();
+	}
+
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
 			if (sg.getProperty().getId().equals("P31")) {
@@ -70,11 +75,4 @@ public class PokemonTypeQuestion implements QuestionType {
 		}
 	}
 
-	@Override public boolean hasNext() {
-		return false;
-	}
-
-	@Override public Question next() {
-		return null;
-	}
 }
