@@ -1,5 +1,6 @@
 item,itemLabel
 Q11843,Schneeweißchen und Rosenrot
+Q11850,Der Froschkönig oder der eiserne Heinrich
 Q11853,Frau Holle
 Q11870,Däumelinchen
 Q23673,Once Upon a Time – Es war einmal…
@@ -8,6 +9,7 @@ Q44647,Otfried Preußler
 Q128917,Goldlöckchen und die drei Bären
 Q201847,Der Bärenhäuter
 Q214565,Beatrix Potter
+Q232362,Zweibrüdermärchen
 Q244019,Zwerg Nase
 Q258749,Ole Lukøje
 Q260138,Igelchen im Nebel
@@ -36,9 +38,11 @@ Q26742488,Harzmärchenbuch
 Q11824,Dornröschen
 Q11872,Der standhafte Zinnsoldat
 Q55767,Astrid Lindgren
+Q102513,Harriet Beecher Stowe
 Q119975,Des Herrn und des Teufels Getier
 Q128460,Charles Perrault
 Q161138,Blaubart
+Q228546,Alphonse Daudet
 Q318116,Der Geist im Glas
 Q323018,Das Lämmchen und Fischchen
 Q404348,Die Ferien des Bonifazius
@@ -48,6 +52,8 @@ Q719143,Uncle Remus
 Q880479,Das blaue Licht
 Q1144655,Ronja Räubertochter
 Q1358834,Alexander Melentjewitsch Wolkow
+Q2436441,Riquet mit dem Schopf
+Q3155970,Itof et la ville souterraine
 Q4095277,Der Seemann und der Papagei
 Q4101844,Die Schneesturmhexe
 Q4237080,Das Katzenhaus
@@ -63,9 +69,13 @@ Q27134855,Das Dornröschen
 Q28007341,Und Pippa tanzt!
 Q11846,Die Sterntaler
 Q11848,Der Wolf und die sieben jungen Geißlein
+Q11861,Die Prinzessin auf der Erbse
+Q49496,Jean de La Fontaine
 Q110671,Die Alte im Wald
+Q142278,Der Hase und der Igel
 Q163027,Grimms Märchen
 Q261148,Der Feuergott der Marranen
+Q302350,Klagen des Bauern
 Q333873,Walentin Petrowitsch Katajew
 Q454484,Fitchers Vogel
 Q465681,Sophie de Ségur
@@ -83,6 +93,7 @@ Q1215813,Die Rose
 Q1247776,Das Märchen vom Fischer und dem Fischlein
 Q1777384,Knoist un sine dre Sühne
 Q2386048,Komet im Mumintal
+Q2439320,Tolldreiste Geschichten
 Q2622393,Die Nachtigall und die Rose
 Q2647258,Alissa w Saserkalje
 Q4235888,Der Kater als Angler
@@ -93,9 +104,11 @@ Q19227423,Schneewittchen
 Q20088312,Dornröschen
 Q27973414,Sagen und Geschichten um die Bergstadt St. Andreasberg
 Q211785,Michail Jewgrafowitsch Saltykow-Schtschedrin
+Q294999,Gabrielle Roy
 Q298685,Theodor Seuss Geisel
 Q316024,Der Gevatter Tod
 Q319844,Die zwei Brüder
+Q340515,Von Tuor und dem Fall von Gondolin
 Q354148,Robert McCloskey
 Q534739,Baum und Blatt
 Q560960,Von dem Machandelboom
@@ -107,8 +120,10 @@ Q1167763,Das Eselein
 Q1170469,Das Sternenkind
 Q1193628,Der Fuchs und das Pferd
 Q1198693,Der gelernte Jäger
+Q1211733,Die Bremer Stadtmusikanten
 Q1215871,Die Rückkehr der Märchenbraut
 Q1238538,Boris Wladimirowitsch Sachoder
+Q1517484,Geschichte des Schiffbrüchigen
 Q2682217,Es lebte einmal ein Hund
 Q4113652,Die verliebte Wolke
 Q4127776,Wer darf fliegen?
@@ -134,12 +149,17 @@ Q1196998,Der Sperling und seine vier Kinder
 Q1198300,Der arme Müllerbursch und das Kätzchen
 Q1212806,Die Froschprinzessin
 Q1609593,Hercules: Zero to Hero
+Q2978153,Claude Seignolle
+Q3204970,L'histoire de Boulik
 Q3209019,Die feuerrote Blume
+Q3395441,Polpon – Opération bonbon
+Q3542440,Tut-Tut / Fafouin
 Q3804499,Stanisław Jachowicz
 Q4239947,Der gefärbte Fuchs
 Q4323433,Die Neujahrsreise
 Q7726529,Ashmadi
 Q27075957,Aschenputtel
+Q51029984,Le Petit Chaperon rouge
 Q74287,Der Hobbit
 Q92640,Alice im Wunderland
 Q320039,Der Räuberbräutigam
@@ -160,9 +180,12 @@ Q1199235,Der kleine Klaus und der große Klaus
 Q1218061,Die drei Brüder
 Q1218633,Die himmlische Hochzeit
 Q1455839,Hans und die Bohnenranke
+Q1810316,Le chandail de hockey
 Q1972808,Die Abenteuer des Burattino oder das goldene Schlüsselchen
 Q2125630,Simeliberg
 Q2658571,Das Märchen von Zar Salat
+Q2843328,Amikwan – Koi koi ayaho
+Q3235605,Die törichten Wünsche
 Q3759322,Gelsomino im Lande der Lügner
 Q4208788,Igel und Bär suchen einen Weihnachtsbaum
 Q4329108,Der Affe von der Sprugasima-Insel
@@ -174,8 +197,10 @@ Q15388909,Das Märchen von Iwan, dem Narren
 Q19232544,Ut ôler Welt
 Q20204480,Die sechs Diener
 Q21148902,Die bestrafte Habgier
+Q51315267,Der Hase und der Igel
 Q11841,Aschenputtel
 Q316237,Der singende Knochen
+Q423298,Pascal Quignard
 Q471398,Bauer Giles von Ham
 Q862536,Die drei Dickwänste
 Q875764,Die Rabe
@@ -192,7 +217,9 @@ Q2944224,Cendrillon
 Q4224362,Der Schlüssel zum Glück
 Q4327884,Na warte! Hase und Wolf auf der Weihnachtsfeier
 Q7754064,Die Nacht vor Weihnachten
+Q51315191,Der Hase und der Igel
 Q8258,Tausendundeine Nacht
+Q11838,Rotkäppchen
 Q45735,Wilbur und Charlotte
 Q138848,Die kluge Bauerntochter
 Q204810,Ion Creangă
@@ -202,6 +229,7 @@ Q322754,Dat Mäken von Brakel
 Q404535,Winnie Pooh
 Q467520,Der verwunschene Prinz
 Q495442,Die Schöne und das Biest
+Q744557,Nussknacker und Mausekönig
 Q832584,Die drei Feldscherer
 Q834811,Dat Erdmänneken
 Q871641,Die alte Bettelfrau
@@ -209,6 +237,7 @@ Q878660,Der König vom goldenen Berg
 Q1171372,Das junggeglühte Männlein
 Q1193634,Der Fuchs und die Katze
 Q1195775,Der Meisterdieb (Märchen)
+Q1198119,Der Wolf und die sieben Geißlein
 Q1198166,Der Zauberer der Smaragdenstadt
 Q1198181,Der Zaunkönig und der Bär
 Q1199706,Der undankbare Sohn
@@ -219,3 +248,4 @@ Q15271109,Der Zauberbrunnen
 Q16647440,Onkel Fjodor, der Hund und der Kater
 Q19172297,Deutsche Volksmärchen aus Schwaben
 Q28219078,Doris Trampnau
+Q51029839,Rotkäppchen
