@@ -44,7 +44,7 @@ public class DumpReducer implements AutoCloseable {
 				outputFileName = "borders.json";
 				break;
 			case "general":
-				predicate = this::generalFilter;
+				predicate = DumpReducer::generalFilter;
 				outputFileName = "reduced.json.gz";
 				break;
 			default:
@@ -80,7 +80,7 @@ public class DumpReducer implements AutoCloseable {
 		reader.start();
 	}
 
-	private boolean generalFilter(final ItemDocument itemDocument) {
+	private static boolean generalFilter(final ItemDocument itemDocument) {
 		// ignore scholarly articles
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
 			if (sg.getProperty().getId().equals("P31")) {
