@@ -21,7 +21,6 @@ public class DumpReducer implements AutoCloseable {
 
 	private static final String INPUT_FILE_NAME = "results/reduced.json.gz"/*"wikidata-20181001-all.json.bz2" */;//TODO think about an optional parameter for full Dump
 
-
 	private final DumpReader reader;
 	private final DumpWriter writer;
 
