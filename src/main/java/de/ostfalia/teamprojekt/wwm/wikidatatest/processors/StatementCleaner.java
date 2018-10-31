@@ -87,10 +87,10 @@ public class StatementCleaner implements EntityDocumentProcessor {
 				Value value = ((ValueSnak) qualifier).getValue();
 				if (value instanceof TimeValue) {
 					TimeValue timeValue = (TimeValue) value;
-					int year = (int) timeValue.getYear();
-					LocalDate date = LocalDate.of(year, 12, 31);
-					if (date.isBefore(LocalDate.now())) {
-						// the statement has an end date which is in the current year
+					int timeValueYear = (int) timeValue.getYear();
+					int currentYear = LocalDate.now().getYear();
+					if (timeValueYear <= currentYear) {
+						// the statement has an end date which is in the current year or earlier
 						return true;
 					}
 				}
