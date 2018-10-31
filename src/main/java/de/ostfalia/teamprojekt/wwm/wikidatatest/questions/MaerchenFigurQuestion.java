@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.wikidata.wdtk.datamodel.interfaces.*;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class MaerchenFigurQuestion implements QuestionType {
 
@@ -44,6 +45,10 @@ public class MaerchenFigurQuestion implements QuestionType {
         return false;
     }
 
+    @Override public Stream<Question> generateQuestions() {
+        return Stream.empty();
+    }
+
     @Override public void processItemDocument(final ItemDocument itemDocument) {
         for (StatementGroup sg : itemDocument.getStatementGroups()) {
             if (sg.getProperty().getId().equals("P1441")) {
@@ -61,12 +66,6 @@ public class MaerchenFigurQuestion implements QuestionType {
         }
     }
 
-    @Override public boolean hasNext() {
-        return false;
-    }
 
-    @Override public Question next() {
-        return null;
-    }
 
 }
