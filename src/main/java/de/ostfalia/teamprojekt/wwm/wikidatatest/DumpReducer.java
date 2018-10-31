@@ -49,10 +49,8 @@ public class DumpReducer implements AutoCloseable {
 				outputFileName = "maerchenFigur.json";
 				break;
 			case "general":
-
 				predicate = DumpReducer::generalFilter;
 				outputFileName = "reduced2.json.gz";
-				
 				break;
 			default:
 				throw new IllegalArgumentException("Bitte Argument übergeben!");
