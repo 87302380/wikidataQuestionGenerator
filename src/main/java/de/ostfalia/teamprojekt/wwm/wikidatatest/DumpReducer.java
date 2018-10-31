@@ -5,6 +5,7 @@ import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.PredicateItemFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.StatementCleaner;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonTypeQuestion;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestionType;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.MaerchenFigurQuestion;
 import org.wikidata.wdtk.datamodel.interfaces.EntityDocumentProcessor;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
@@ -18,7 +19,7 @@ import java.util.function.Predicate;
 
 public class DumpReducer implements AutoCloseable {
 
-	private static final String INPUT_FILE_NAME = "wikidata-20181001-all.json.bz2";
+	private static final String INPUT_FILE_NAME = "/media/leichen/DAA6F84CA6F82AA1/wikidata-20181001-all.json.gz";
 
 	private final DumpReader reader;
 	private final DumpWriter writer;
@@ -42,6 +43,10 @@ public class DumpReducer implements AutoCloseable {
 			case "borders":
 				predicate = new SharedBordersQuestionType()::itemRelevant;
 				outputFileName = "borders.json";
+				break;
+			case "maerchen":
+				predicate = new MaerchenFigurQuestion()::itemRelevant;
+				outputFileName = "maerchenFigur.json";
 				break;
 			case "general":
 				predicate = this::generalFilter;
@@ -68,10 +73,10 @@ public class DumpReducer implements AutoCloseable {
 	 *
 	 * @throws IOException if there was a problem in writing the output file
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		IoHelpers.configureLogging();
 
-		try (DumpReducer main = new DumpReducer(args[0])) {
+		try (DumpReducer main = new DumpReducer("maerchen")) {
 			main.start();
 		}
 	}
