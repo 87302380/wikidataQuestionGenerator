@@ -8,6 +8,9 @@ import org.wikidata.wdtk.datamodel.interfaces.*;
  *
  */
 public class SharedBordersQuestionType implements QuestionType {
+	private static final String PROPERTY_INSTANCE_OF = "P31";
+	private static final String PROPERTY_DISSOLVED_OR_ABOLISHED = "P576";
+	private static final String PROPERTY_COUNTRY = "Q6256";
 
 	/**
 	 * @param itemDocument
@@ -16,15 +19,20 @@ public class SharedBordersQuestionType implements QuestionType {
 	@Override
 	public boolean itemRelevant(ItemDocument itemDocument) {
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
-			// "P31" is "instance of" on Wikidata
-			if (!sg.getProperty().getId().equals("P31")) {
+
+			if (sg.getProperty().getId().equals(PROPERTY_DISSOLVED_OR_ABOLISHED)){
+				return false;
+			}
+
+			if (!sg.getProperty().getId().equals(PROPERTY_INSTANCE_OF)) {
 				continue;
 			}
+
 			for (Statement s : sg.getStatements()) {
 				if (s.getClaim().getMainSnak() instanceof ValueSnak) {
 					Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
-					// "Q6256" is "country" on Wikidata
-					if (v instanceof ItemIdValue && ((ItemIdValue) v).getId().equals("Q6256")) {
+
+					if (v instanceof ItemIdValue && ((ItemIdValue) v).getId().equals(PROPERTY_COUNTRY)) {
 						return true;
 					}
 				}
