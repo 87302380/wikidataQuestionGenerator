@@ -76,7 +76,7 @@ public class DumpReducer implements AutoCloseable {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		IoHelpers.configureLogging();
 
-		try (DumpReducer main = new DumpReducer("maerchen")) {
+		try (DumpReducer main = new DumpReducer(args[0])) {
 			main.start();
 		}
 	}
