@@ -1,23 +1,19 @@
-item,itemLabel
-Q2300906,unknown-type Pokémon
-Q15141638,starter Pokémon
-Q25707067,Pokémon without evolution
-Q25930490,fire-type Pokémon
-Q25930493,flying-type Pokémon
-Q25930495,water-type Pokémon
-Q25930498,normal-type Pokémon
-Q25930532,fighting-type Pokémon
-Q25930653,grass-type Pokémon
-Q25930717,poison-type Pokémon
-Q25930719,electric-type Pokémon
-Q25930733,ground-type Pokémon
-Q25930740,psychic-type Pokémon
-Q25930744,rock-type Pokémon
-Q25930752,ice-type Pokémon
-Q25930757,bug-type Pokémon
-Q25930759,dragon-type Pokémon
-Q25930806,ghost-type Pokémon
-Q25930811,dark-type Pokémon
-Q25930813,steel-type Pokémon
-Q25930814,fairy-type Pokémon
-Q26897926,Ultra Beast
+item,itemLabel,
+Q25930490,Feuer-Pokémon
+Q25930493,Flug-Pokémon
+Q25930495,Wasser-Pokémon
+Q25930498,Normal-Pokémon
+Q25930532,Kampf-Pokémon
+Q25930653,Gras-Pokémon
+Q25930717,Gift-Pokémon
+Q25930719,Elektro-Pokémon
+Q25930733,Boden-Pokémon
+Q25930740,Psycho-Pokémon
+Q25930744,Gestein-Pokémon
+Q25930752,Eis-Pokémon
+Q25930757,Käfer-Pokémon
+Q25930759,Drache-Pokémon
+Q25930806,Geist-Pokémon
+Q25930811,Unlicht-Pokémon
+Q25930813,Stahl-Pokémon
+Q25930814,Fee-Pokémon
