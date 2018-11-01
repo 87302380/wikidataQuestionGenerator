@@ -48,7 +48,7 @@ public class DumpReader {
 		@Override public void processItemDocument(final ItemDocument itemDocument) {
 			count++;
 			if (count % 10_000 == 0) {
-				LOGGER.info(count + " items processed");
+				LOGGER.info("{} items processed", count);
 			}
 			next.processItemDocument(itemDocument);
 		}
