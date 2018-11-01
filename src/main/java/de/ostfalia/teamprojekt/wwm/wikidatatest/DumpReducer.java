@@ -73,7 +73,7 @@ public class DumpReducer implements AutoCloseable {
 	 *
 	 * @throws IOException if there was a problem in writing the output file
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException {
+	public static void main(String[] args) throws IOException {
 		IoHelpers.configureLogging();
 
 		try (DumpReducer main = new DumpReducer(args[0])) {
