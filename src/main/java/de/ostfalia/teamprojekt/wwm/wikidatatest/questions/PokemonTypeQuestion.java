@@ -151,7 +151,7 @@ public class PokemonTypeQuestion implements QuestionType {
 			String type = entry.getKey();
 			List<ItemDocument> pokemon = entry.getValue();
 			String text = "Welches dieser Pokemon ist ein " + typeLabels.get(type) + "?";
-			String correctPokemon = pokemon.get(Math.min(pokemon.size(), RANDOM.nextInt(ESTIMATED_NUMBER_OF_WELL_KNOWN_POKEMON_PER_TYPE))).findLabel("de");
+			String correctPokemon = pokemon.get(Math.min(pokemon.size() - 1, RANDOM.nextInt(ESTIMATED_NUMBER_OF_WELL_KNOWN_POKEMON_PER_TYPE))).findLabel("de");
 
 			Predicate<ItemDocument> pokemonHasType = i -> i.hasStatementValue(PROPERTY_INSTANCE_OF, new ItemIdValueImpl(type, WIKIDATA_SITE_URL));
 
