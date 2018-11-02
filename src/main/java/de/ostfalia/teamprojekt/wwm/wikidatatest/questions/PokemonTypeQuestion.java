@@ -141,7 +141,7 @@ public class PokemonTypeQuestion implements QuestionType {
 
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
-			if (sg.getProperty().getId().equals("P31")) {
+			if (sg.getProperty().getId().equals(PROPERTY_INSTANCE_OF)) {
 				for (Statement s : sg.getStatements()) {
 					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
 						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
