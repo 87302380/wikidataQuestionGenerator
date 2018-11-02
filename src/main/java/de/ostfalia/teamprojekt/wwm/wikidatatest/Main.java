@@ -56,7 +56,7 @@ public class Main {
 	public void start() {
 		reader.start();
 		Stream<Question> questions = questionType.generateQuestions();
-		questions.limit(10).forEach(System.out::println);
+		questions.limit(50).forEach(System.out::println);
 	}
 
 }
