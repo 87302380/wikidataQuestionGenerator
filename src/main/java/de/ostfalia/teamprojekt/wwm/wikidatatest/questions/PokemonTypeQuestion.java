@@ -20,15 +20,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 
@@ -107,9 +105,8 @@ public class PokemonTypeQuestion implements QuestionType {
 				.distinct()
 				.collect(toList());
 
-		Iterator<Question> questions = new PokemonQuestionIterator(wellKnownPokemon);
-
-		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(questions, 0), false);
+		Supplier<Question> questions = new PokemonQuestionSupplier(wellKnownPokemon);
+		return Stream.generate(questions);
 	}
 
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
@@ -133,23 +130,18 @@ public class PokemonTypeQuestion implements QuestionType {
 		}
 	}
 
-	private class PokemonQuestionIterator implements Iterator<Question> {
+	private class PokemonQuestionSupplier implements Supplier<Question> {
+		private final ImmutableList<String> types;
 		private final List<ItemDocument> wellKnownPokemon;
-		private Iterator<Entry<String, List<ItemDocument>>> pokemonByTypeIterator;
 
-		public PokemonQuestionIterator(final List<ItemDocument> wellKnownPokemon) {
+		public PokemonQuestionSupplier(final List<ItemDocument> wellKnownPokemon) {
+			types = ImmutableList.copyOf(typeLabels.keySet());
 			this.wellKnownPokemon = wellKnownPokemon;
-			pokemonByTypeIterator = pokemonByType.entrySet().iterator();
 		}
 
-		@Override public boolean hasNext() {
-			return pokemonByTypeIterator.hasNext();
-		}
-
-		@Override public Question next() {
-			Entry<String, List<ItemDocument>> entry = pokemonByTypeIterator.next();
-			String type = entry.getKey();
-			List<ItemDocument> pokemon = entry.getValue();
+		@Override public Question get() {
+			String type = types.get(RANDOM.nextInt(types.size()));
+			List<ItemDocument> pokemon = pokemonByType.get(type);
 			String text = "Welches dieser Pokemon ist ein " + typeLabels.get(type) + "?";
 			String correctPokemon = pokemon.get(Math.min(pokemon.size() - 1, RANDOM.nextInt(ESTIMATED_NUMBER_OF_WELL_KNOWN_POKEMON_PER_TYPE))).findLabel("de");
 
