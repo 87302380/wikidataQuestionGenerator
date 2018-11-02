@@ -125,6 +125,7 @@ public class PokemonTypeQuestion implements QuestionType {
 				Predicate<ItemDocument> pokemonHasType = i -> i.hasStatementValue(PROPERTY_INSTANCE_OF, new ItemIdValueImpl(type, WIKIDATA_SITE_URL));
 
 				List<String> wrongPokemon = RANDOM.ints(0, wellKnownPokemon.size())
+						.distinct()
 						.mapToObj(wellKnownPokemon::get)
 						.filter(pokemonHasType.negate())
 						.limit(3)
