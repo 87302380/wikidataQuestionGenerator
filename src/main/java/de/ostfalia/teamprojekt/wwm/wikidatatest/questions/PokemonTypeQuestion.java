@@ -99,7 +99,6 @@ public class PokemonTypeQuestion implements QuestionType {
 			pokemon.sort(STATEMENT_COUNT_COMPARATOR.reversed());
 		}
 
-
 		List<ItemDocument> wellKnownPokemon = pokemonByType.values()
 				.stream()
 				.map(Collection::stream)
@@ -108,34 +107,7 @@ public class PokemonTypeQuestion implements QuestionType {
 				.distinct()
 				.collect(toList());
 
-		Iterator<Question> questions = new Iterator<Question>() {
-			private Iterator<Entry<String, List<ItemDocument>>> pokemonByTypeIterator = PokemonTypeQuestion.this.pokemonByType.entrySet().iterator();
-
-			@Override public boolean hasNext() {
-				return pokemonByTypeIterator.hasNext();
-			}
-
-			@Override public Question next() {
-				Entry<String, List<ItemDocument>> entry = pokemonByTypeIterator.next();
-				String type = entry.getKey();
-				List<ItemDocument> pokemon = entry.getValue();
-				String text = "Welches dieser Pokemon ist ein " + typeLabels.get(type) + "?";
-				String correctPokemon = pokemon.get(Math.min(pokemon.size(), RANDOM.nextInt(ESTIMATED_NUMBER_OF_WELL_KNOWN_POKEMON_PER_TYPE))).findLabel("de");
-
-				Predicate<ItemDocument> pokemonHasType = i -> i.hasStatementValue(PROPERTY_INSTANCE_OF, new ItemIdValueImpl(type, WIKIDATA_SITE_URL));
-
-				List<String> wrongPokemon = RANDOM.ints(0, wellKnownPokemon.size())
-						.distinct()
-						.mapToObj(wellKnownPokemon::get)
-						.filter(pokemonHasType.negate())
-						.limit(3)
-						.map(i -> i.findLabel("de"))
-						.collect(toList());
-
-				ImmutableList<String> answers = ImmutableList.<String>builder().add(correctPokemon).addAll(wrongPokemon).build();
-				return new Question(text, answers);
-			}
-		};
+		Iterator<Question> questions = new PokemonQuestionIterator(wellKnownPokemon);
 
 		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(questions, 0), false);
 	}
@@ -161,4 +133,38 @@ public class PokemonTypeQuestion implements QuestionType {
 		}
 	}
 
+	private class PokemonQuestionIterator implements Iterator<Question> {
+		private final List<ItemDocument> wellKnownPokemon;
+		private Iterator<Entry<String, List<ItemDocument>>> pokemonByTypeIterator;
+
+		public PokemonQuestionIterator(final List<ItemDocument> wellKnownPokemon) {
+			this.wellKnownPokemon = wellKnownPokemon;
+			pokemonByTypeIterator = pokemonByType.entrySet().iterator();
+		}
+
+		@Override public boolean hasNext() {
+			return pokemonByTypeIterator.hasNext();
+		}
+
+		@Override public Question next() {
+			Entry<String, List<ItemDocument>> entry = pokemonByTypeIterator.next();
+			String type = entry.getKey();
+			List<ItemDocument> pokemon = entry.getValue();
+			String text = "Welches dieser Pokemon ist ein " + typeLabels.get(type) + "?";
+			String correctPokemon = pokemon.get(Math.min(pokemon.size(), RANDOM.nextInt(ESTIMATED_NUMBER_OF_WELL_KNOWN_POKEMON_PER_TYPE))).findLabel("de");
+
+			Predicate<ItemDocument> pokemonHasType = i -> i.hasStatementValue(PROPERTY_INSTANCE_OF, new ItemIdValueImpl(type, WIKIDATA_SITE_URL));
+
+			List<String> wrongPokemon = RANDOM.ints(0, wellKnownPokemon.size())
+					.distinct()
+					.mapToObj(wellKnownPokemon::get)
+					.filter(pokemonHasType.negate())
+					.limit(3)
+					.map(i -> i.findLabel("de"))
+					.collect(toList());
+
+			ImmutableList<String> answers = ImmutableList.<String>builder().add(correctPokemon).addAll(wrongPokemon).build();
+			return new Question(text, answers);
+		}
+	}
 }
