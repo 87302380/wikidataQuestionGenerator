@@ -1,12 +1,14 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.MaerchenFigurQuestion;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonTypeQuestion;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.QuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.stream.Stream;
 
 public class Main {
@@ -31,6 +33,10 @@ public class Main {
 				questionType = new SharedBordersQuestionType();
 				inputFileName = "borders.json";
 				break;
+			case "maerchen":
+				questionType = new MaerchenFigurQuestion();
+				inputFileName = "maerchen.json";
+				break;
 			default:
 				throw new IllegalArgumentException("Bitte Argument übergeben!");
 		}
@@ -42,7 +48,7 @@ public class Main {
 	 * Runs the example program.
 	 *
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException{
 		IoHelpers.configureLogging();
 
 		if (args.length < 1) {
@@ -53,10 +59,10 @@ public class Main {
 		main.start();
 	}
 
-	public void start() {
+	public void start() throws IOException {
 		reader.start();
 		Stream<Question> questions = questionType.generateQuestions();
-		questions.limit(50).forEach(System.out::println);
+		questions.limit(10).forEach(System.out::println);
 	}
 
 }
