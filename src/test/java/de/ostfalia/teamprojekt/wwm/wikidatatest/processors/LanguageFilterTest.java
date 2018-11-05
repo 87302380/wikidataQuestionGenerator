@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.wikidata.wdtk.datamodel.helpers.Datamodel.makeDatatypeIdValue;
 import static org.wikidata.wdtk.datamodel.helpers.Datamodel.makeItemDocument;
-import static org.wikidata.wdtk.datamodel.helpers.Datamodel.makeItemIdValue;
 import static org.wikidata.wdtk.datamodel.helpers.Datamodel.makeLexemeDocument;
 import static org.wikidata.wdtk.datamodel.helpers.Datamodel.makeMonolingualTextValue;
 import static org.wikidata.wdtk.datamodel.helpers.Datamodel.makePropertyDocument;
@@ -38,7 +37,7 @@ class LanguageFilterTest {
 
 	@Test
 	void testProcessItemDocumentNullLabels() {
-		lf.processItemDocument(makeItemDocument(makeItemIdValue("Q0", ""), null, null, null, null, emptyMap()));
+		lf.processItemDocument(makeItemDocument(ItemIdValue.NULL, null, null, null, null, emptyMap()));
 		assertEquals(0, mp.processItemDocumentCount);
 		assertEquals(0, mp.processPropertyDocumentCount);
 		assertEquals(0, mp.processLexemeDocumentCount);
@@ -46,7 +45,7 @@ class LanguageFilterTest {
 
 	@Test
 	void testProcessItemDocumentEmptyLabels() {
-		lf.processItemDocument(makeItemDocument(makeItemIdValue("Q0", ""), emptyList(), null, null, null, emptyMap()));
+		lf.processItemDocument(makeItemDocument(ItemIdValue.NULL, emptyList(), null, null, null, emptyMap()));
 		assertEquals(0, mp.processItemDocumentCount);
 		assertEquals(0, mp.processPropertyDocumentCount);
 		assertEquals(0, mp.processLexemeDocumentCount);
