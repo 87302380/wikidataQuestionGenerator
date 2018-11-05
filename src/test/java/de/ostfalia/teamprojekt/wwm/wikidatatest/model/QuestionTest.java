@@ -16,4 +16,9 @@ class QuestionTest {
 		new Question("", ImmutableList.of("", "", "", ""));
 		assertThrows(IllegalArgumentException.class, () -> new Question("", ImmutableList.of("", "", "", "", "")));
 	}
+
+	@Test
+	void testToString() {
+		assertEquals("a 1) b, 2) c, 3) d, 4) e", new Question("a", ImmutableList.of("b", "c", "d", "e")).toString());
+	}
 }
