@@ -25,17 +25,17 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class MaerchenFigurQuestionType implements QuestionType {
+public class FairyTaleCharacterQuestionType implements QuestionType {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MaerchenFigurQuestionType.class);
-	private static Map<String, Set<String>> maerchenFigur = new HashMap<>();
+	private static final Logger LOGGER = LoggerFactory.getLogger(FairyTaleCharacterQuestionType.class);
+	private static Map<String, Set<String>> fairyTaleCharacters = new HashMap<>();
 
-	public MaerchenFigurQuestionType() {
-		if (maerchenFigur.isEmpty()) {
-			try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream("maerchenResources/maerchenList.csv"), "UTF-8")) {
+	public FairyTaleCharacterQuestionType() {
+		if (fairyTaleCharacters.isEmpty()) {
+			try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream("fairyTaleResources/fairyTales.csv"), "UTF-8")) {
 				s.useDelimiter(",");
 				while (s.hasNext()) {
-					maerchenFigur.put(s.next(), new HashSet<>(1000));
+					fairyTaleCharacters.put(s.next(), new HashSet<>(1000));
 					s.nextLine();
 				}
 			}
@@ -48,7 +48,7 @@ public class MaerchenFigurQuestionType implements QuestionType {
 				for (Statement s : sg.getStatements()) {
 					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
 						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
-						if (v instanceof ItemIdValue && maerchenFigur.containsKey(((ItemIdValue) v).getId())) {
+						if (v instanceof ItemIdValue && fairyTaleCharacters.containsKey(((ItemIdValue) v).getId())) {
 							// german label might not exist
 							//LOGGER.log(Level.INFO, itemDocument.getLabels().get("de").getText() + ": " + ((ItemIdValue) v).getId());
 							LOGGER.info(itemDocument.getEntityId().getId() + " is of type " + ((ItemIdValue) v).getId());
@@ -83,9 +83,9 @@ public class MaerchenFigurQuestionType implements QuestionType {
 					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
 						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
 						if (v instanceof ItemIdValue) {
-							String maerchen = ((ItemIdValue) v).getId();
-							maerchenFigur.get(maerchen).add(itemDocument.getLabels().get("de").getText());
-							LOGGER.info(itemDocument.getLabels().get("de").getText() + ": " + maerchen);
+							String fairyTale = ((ItemIdValue) v).getId();
+							fairyTaleCharacters.get(fairyTale).add(itemDocument.getLabels().get("de").getText());
+							LOGGER.info(itemDocument.getLabels().get("de").getText() + ": " + fairyTale);
 						}
 					}
 				}
@@ -95,19 +95,19 @@ public class MaerchenFigurQuestionType implements QuestionType {
 
 	public static class QuestionGenerator {
 
-		Map<String, List<String>> maerchenList = new HashMap<>();
+		Map<String, List<String>> fairyTales = new HashMap<>();
 		Map<String, List<String>> map = new HashMap<>();
-		private String maerchenPath = "./src/main/resources/maerchenResources/maerchenList.csv";
-		private String maerchenFigurPath = "./src/main/resources/maerchenResources/maerchenFigurList.csv";
-		private String answerPath = "./src/main/resources/maerchenResources/antwort.csv";
+		private String fairyTalePath = "./src/main/resources/fairyTaleResources/fairyTales.csv";
+		private String charactersPath = "./src/main/resources/fairyTaleResources/characters.csv";
+		private String answerPath = "./src/main/resources/fairyTaleResources/answers.csv";
 
 		private QuestionGenerator() throws IOException {
 
-			String[] maerchen = this.dataRead(maerchenPath);
-			String[] maerchenFigur = dataRead(maerchenFigurPath);
+			String[] fairyTales = this.dataRead(fairyTalePath);
+			String[] characters = dataRead(charactersPath);
 			String[] answer = dataRead(answerPath);
 
-			mapGenerator(this.maerchenList, mergeArray(maerchen, maerchenFigur));
+			mapGenerator(this.fairyTales, mergeArray(fairyTales, characters));
 			mapGenerator(this.map, answer);
 
 		}
@@ -145,8 +145,8 @@ public class MaerchenFigurQuestionType implements QuestionType {
 			List<String> enty = entityGenerator(this.map);
 			List<String> option = optionGenerator(enty, this.map);
 
-			idToLabel(enty, this.maerchenList);
-			idToLabel(option, this.maerchenList);
+			idToLabel(enty, this.fairyTales);
+			idToLabel(option, this.fairyTales);
 
 			return questionLoad(enty, option);
 
@@ -208,10 +208,10 @@ public class MaerchenFigurQuestionType implements QuestionType {
 			return optionlist;
 		}
 
-		private void idToLabel(List<String> list, Map<String, List<String>> maerchenList) {
+		private void idToLabel(List<String> list, Map<String, List<String>> map) {
 			for (int i = 0; i < list.size(); i++) {
-				if (maerchenList.containsKey(list.get(i))) {
-					list.set(i, maerchenList.get(list.get(i)).get(0));
+				if (map.containsKey(list.get(i))) {
+					list.set(i, map.get(list.get(i)).get(0));
 				}
 			}
 		}
