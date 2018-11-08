@@ -1,7 +1,7 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.MaerchenFigurQuestionType;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.FairyTaleCharacterQuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonQuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.QuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestionType;
@@ -34,7 +34,7 @@ public class Main {
 				inputFileName = "borders.json";
 				break;
 			case "maerchen":
-				questionType = new MaerchenFigurQuestionType();
+				questionType = new FairyTaleCharacterQuestionType();
 				inputFileName = "maerchen.json";
 				break;
 			default:

@@ -5,7 +5,7 @@ import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.PredicateItemFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.StatementCleaner;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonQuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestionType;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.MaerchenFigurQuestionType;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.FairyTaleCharacterQuestionType;
 import org.wikidata.wdtk.datamodel.interfaces.EntityDocumentProcessor;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
@@ -45,7 +45,7 @@ public class DumpReducer implements AutoCloseable {
 				outputFileName = "borders.json";
 				break;
 			case "maerchen":
-				predicate = new MaerchenFigurQuestionType()::itemRelevant;
+				predicate = new FairyTaleCharacterQuestionType()::itemRelevant;
 				outputFileName = "maerchenFigur.json";
 				break;
 			case "general":
