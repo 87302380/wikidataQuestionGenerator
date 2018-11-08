@@ -142,13 +142,13 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 
 		private Question getQuestion() {
 
-			List<String> enty = entityGenerator(this.map);
-			List<String> option = optionGenerator(enty, this.map);
+			List<String> entity = entityGenerator(this.map);
+			List<String> option = optionGenerator(entity, this.map);
 
-			idToLabel(enty, this.fairyTales);
+			idToLabel(entity, this.fairyTales);
 			idToLabel(option, this.fairyTales);
 
-			return questionLoad(enty, option);
+			return questionLoad(entity, option);
 
 		}
 
@@ -182,30 +182,30 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 
 			Random random = new Random();
 
-			List<String> optionlist = new ArrayList<>();
+			List<String> optionList = new ArrayList<>();
 
-			optionlist.add(map.get(entityList.get(0)).get(random.nextInt(map.get(entityList.get(0)).size())));
+			optionList.add(map.get(entityList.get(0)).get(random.nextInt(map.get(entityList.get(0)).size())));
 
-			while (optionlist.size() < 4) {
+			while (optionList.size() < 4) {
 
 				boolean isNewOption = true;
 
 				String keyValue = key[random.nextInt(key.length)];
 				String option = map.get(keyValue).get(random.nextInt(map.get(keyValue).size()));
 
-				for (String string : optionlist) {
+				for (String string : optionList) {
 					if (option.equals(string)) {
 						isNewOption = false;
 						break;
 					}
 				}
 				if (isNewOption) {
-					optionlist.add(option);
+					optionList.add(option);
 				}
 
 			}
 
-			return optionlist;
+			return optionList;
 		}
 
 		private void idToLabel(List<String> list, Map<String, List<String>> map) {
@@ -216,9 +216,9 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 			}
 		}
 
-		private Question questionLoad(List<String> entylist, List<String> optionlist) {
+		private Question questionLoad(List<String> entitylist, List<String> optionlist) {
 
-			String text = entylist.get(0) + " kommt aus welchen folfenden Märchen?";
+			String text = entitylist.get(0) + " kommt aus welchen folfenden Märchen?";
 
 			return new Question(text, ImmutableList.copyOf(optionlist));
 		}
