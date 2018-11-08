@@ -30,9 +30,9 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
-public class PokemonTypeQuestion implements QuestionType {
+public class PokemonQuestionType implements QuestionType {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(PokemonTypeQuestion.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PokemonQuestionType.class);
 	private static final String PROPERTY_INSTANCE_OF = "P31";
 	private static final String PROPERTY_FROM_FICTIONAL_UNIVERSE = "P1080";
 	private static final String PROPERTY_DIFFERENT_FROM = "P1889";
@@ -40,7 +40,7 @@ public class PokemonTypeQuestion implements QuestionType {
 	private static final Set<String> IGNORE_STATEMENTS_WHEN_COUNTING = Sets.newHashSet(
 			PROPERTY_FROM_FICTIONAL_UNIVERSE, PROPERTY_DIFFERENT_FROM, PROPERTY_BULBAPEDIA_ARTICLE
 	);
-	private static final Comparator<ItemDocument> STATEMENT_COUNT_COMPARATOR = Comparator.comparingInt(PokemonTypeQuestion::numberOfKnowledgeStatements);
+	private static final Comparator<ItemDocument> STATEMENT_COUNT_COMPARATOR = Comparator.comparingInt(PokemonQuestionType::numberOfKnowledgeStatements);
 	private static final Random RANDOM = new Random();
 	private static final String WIKIDATA_SITE_URL = "http://www.wikidata.org/entity/";
 	private static final int ESTIMATED_NUMBER_OF_WELL_KNOWN_POKEMON_PER_TYPE = 50;
@@ -48,7 +48,7 @@ public class PokemonTypeQuestion implements QuestionType {
 	private Map<String, List<ItemDocument>> pokemonByType = new HashMap<>();
 	private Map<String, String> typeLabels = new HashMap<>();
 
-	public PokemonTypeQuestion() {
+	public PokemonQuestionType() {
 		try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream("pokemontypes.csv"), "UTF-8")) {
 			s.useDelimiter("[,\n]");
 			s.nextLine(); // skip first line
