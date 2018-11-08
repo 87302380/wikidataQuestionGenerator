@@ -1,8 +1,8 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.MaerchenFigurQuestion;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonTypeQuestion;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.MaerchenFigurQuestionType;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonQuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.QuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestionType;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class Main {
 
 		switch (argument) {
 			case "pokemon":
-				questionType = new PokemonTypeQuestion();
+				questionType = new PokemonQuestionType();
 				inputFileName = "pokemon.json";
 				break;
 			case "borders":
@@ -34,7 +34,7 @@ public class Main {
 				inputFileName = "borders.json";
 				break;
 			case "maerchen":
-				questionType = new MaerchenFigurQuestion();
+				questionType = new MaerchenFigurQuestionType();
 				inputFileName = "maerchen.json";
 				break;
 			default:

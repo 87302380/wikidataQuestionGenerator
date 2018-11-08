@@ -25,12 +25,12 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class MaerchenFigurQuestion implements QuestionType {
+public class MaerchenFigurQuestionType implements QuestionType {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MaerchenFigurQuestion.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MaerchenFigurQuestionType.class);
 	private static Map<String, Set<String>> maerchenFigur = new HashMap<>();
 
-	public MaerchenFigurQuestion() {
+	public MaerchenFigurQuestionType() {
 		if (maerchenFigur.isEmpty()) {
 			try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream("maerchenResources/maerchenList.csv"), "UTF-8")) {
 				s.useDelimiter(",");

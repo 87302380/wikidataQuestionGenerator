@@ -3,9 +3,9 @@ package de.ostfalia.teamprojekt.wwm.wikidatatest;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.LanguageFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.PredicateItemFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.StatementCleaner;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonTypeQuestion;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonQuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestionType;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.MaerchenFigurQuestion;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.MaerchenFigurQuestionType;
 import org.wikidata.wdtk.datamodel.interfaces.EntityDocumentProcessor;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
@@ -37,7 +37,7 @@ public class DumpReducer implements AutoCloseable {
 		String outputFileName;
 		switch (arg) {
 			case "pokemon":
-				predicate = new PokemonTypeQuestion()::itemRelevant;
+				predicate = new PokemonQuestionType()::itemRelevant;
 				outputFileName = "pokemon.json";
 				break;
 			case "borders":
@@ -45,7 +45,7 @@ public class DumpReducer implements AutoCloseable {
 				outputFileName = "borders.json";
 				break;
 			case "maerchen":
-				predicate = new MaerchenFigurQuestion()::itemRelevant;
+				predicate = new MaerchenFigurQuestionType()::itemRelevant;
 				outputFileName = "maerchenFigur.json";
 				break;
 			case "general":
