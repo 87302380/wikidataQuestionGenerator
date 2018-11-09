@@ -1,8 +1,9 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
@@ -12,30 +13,39 @@ import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
 import org.wikidata.wdtk.datamodel.interfaces.Value;
 import org.wikidata.wdtk.datamodel.interfaces.ValueSnak;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 public class FairyTaleCharacterQuestionType implements QuestionType {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FairyTaleCharacterQuestionType.class);
-	private static Map<String, Set<String>> fairyTaleCharacters = new HashMap<>();
+	private static final String PROPERTY_PRESENT_IN_WORK = "P1441";
+	private static final String FAIRY_TALE_PATH = "fairyTaleResources/fairyTales.csv";
+	private static final Map<String, Set<String>> fairyTaleToCharacters = new HashMap<>();
 
 	public FairyTaleCharacterQuestionType() {
-		if (fairyTaleCharacters.isEmpty()) {
-			try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream("fairyTaleResources/fairyTales.csv"), "UTF-8")) {
+		if (fairyTaleToCharacters.isEmpty()) {
+			try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream(FAIRY_TALE_PATH), "UTF-8")) {
 				s.useDelimiter(",");
 				while (s.hasNext()) {
-					fairyTaleCharacters.put(s.next(), new HashSet<>(1000));
+					fairyTaleToCharacters.put(s.next(), new HashSet<>(1000));
 					s.nextLine();
 				}
 			}
@@ -44,14 +54,14 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 
 	@Override public boolean itemRelevant(final ItemDocument itemDocument) {
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
-			if (sg.getProperty().getId().equals("P1441")) {
+			if (sg.getProperty().getId().equals(PROPERTY_PRESENT_IN_WORK)) {
 				for (Statement s : sg.getStatements()) {
 					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
 						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
-						if (v instanceof ItemIdValue && fairyTaleCharacters.containsKey(((ItemIdValue) v).getId())) {
+						if (v instanceof ItemIdValue && fairyTaleToCharacters.containsKey(((ItemIdValue) v).getId())) {
 							// german label might not exist
 							//LOGGER.log(Level.INFO, itemDocument.getLabels().get("de").getText() + ": " + ((ItemIdValue) v).getId());
-							LOGGER.info(itemDocument.getEntityId().getId() + " is of type " + ((ItemIdValue) v).getId());
+							LOGGER.info("{} is a character in {}", itemDocument.getEntityId().getId(), ((ItemIdValue) v).getId());
 							return true;
 						}
 					}
@@ -60,7 +70,6 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 		}
 		return false;
 	}
-
 
 	@Override public Stream<Question> generateQuestions() {
 
@@ -71,21 +80,19 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 			throw new RuntimeException(e);
 		}
 
-		Supplier<Question> questions = questionGenerator::getQuestion;
-
-		return Stream.generate(questions);
+		return Stream.generate(questionGenerator::getQuestion);
 	}
 
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
-			if (sg.getProperty().getId().equals("P1441")) {
+			if (sg.getProperty().getId().equals(PROPERTY_PRESENT_IN_WORK)) {
 				for (Statement s : sg.getStatements()) {
 					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
 						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
 						if (v instanceof ItemIdValue) {
-							String fairyTale = ((ItemIdValue) v).getId();
-							fairyTaleCharacters.get(fairyTale).add(itemDocument.getLabels().get("de").getText());
-							LOGGER.info(itemDocument.getLabels().get("de").getText() + ": " + fairyTale);
+							String fairyTaleId = ((ItemIdValue) v).getId();
+							LOGGER.info("{} is a character in {}", itemDocument.getLabels().get("de").getText(), fairyTaleId);
+							fairyTaleToCharacters.get(fairyTaleId).add(itemDocument.getLabels().get("de").getText());
 						}
 					}
 				}
@@ -93,136 +100,110 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 		}
 	}
 
-	public static class QuestionGenerator {
+	private static class QuestionGenerator {
 
-		Map<String, List<String>> fairyTales = new HashMap<>();
-		Map<String, List<String>> map = new HashMap<>();
-		private String fairyTalePath = "./src/main/resources/fairyTaleResources/fairyTales.csv";
-		private String charactersPath = "./src/main/resources/fairyTaleResources/characters.csv";
-		private String answerPath = "./src/main/resources/fairyTaleResources/answers.csv";
+		private static final Random RANDOM = new Random();
+		private final Map<String, String> idToLabel;
+		private final Map<String, List<String>> characterToFairyTales;
+
+		private static final String CHARACTERS_PATH = "fairyTaleResources/characters.csv";
+		private static final String ANSWER_PATH = "fairyTaleResources/answers.csv";
 
 		private QuestionGenerator() throws IOException {
 
-			String[] fairyTales = this.dataRead(fairyTalePath);
-			String[] characters = dataRead(charactersPath);
-			String[] answer = dataRead(answerPath);
+			String[] fairyTales = readLines(FAIRY_TALE_PATH);
+			String[] characters = readLines(CHARACTERS_PATH);
+			String[] answer = readLines(ANSWER_PATH);
 
-			mapGenerator(this.fairyTales, mergeArray(fairyTales, characters));
-			mapGenerator(this.map, answer);
+			// assumes no ids occur more than once
+			this.idToLabel = Arrays.stream(mergeArray(fairyTales, characters))
+					.map(line -> line.split(","))
+					.collect(toMap(parts -> parts[0], parts -> parts[1]));
+			this.characterToFairyTales = mapGenerator(answer);
 
 		}
 
-		String[] dataRead(String input) throws IOException {
-			File file = new File(input);
-			String content = FileUtils.readFileToString(file, "UTF-8");
-
+		private static String[] readLines(String filename) throws IOException {
+			InputStream is = FairyTaleCharacterQuestionType.class.getClassLoader().getResourceAsStream(filename);
+			String content = IOUtils.toString(is, StandardCharsets.UTF_8);
 			return content.split("\n");
 		}
 
-		private void mapGenerator(Map<String, List<String>> map, String[] answer) {
-
-			for (String a : answer) {
-				String[] entity = a.split(",");
-				if (map.get(entity[0]) == null) {
-					List<String> answerList = new ArrayList<>();
-					answerList.add(entity[1]);
-					map.put(entity[0], answerList);
-				} else {
-					map.get(entity[0]).add(entity[1]);
-				}
-			}
-		}
-
-		private String[] mergeArray(String[] a, String[] b) {
+		private static String[] mergeArray(String[] a, String[] b) {
 			String[] c = new String[a.length + b.length];
 			System.arraycopy(a, 0, c, 0, a.length);
 			System.arraycopy(b, 0, c, a.length, b.length);
 			return c;
 		}
 
+		/**
+		 * Convert lines of a csv file to a map of all key-value-pairs.
+		 * <p>
+		 * Example:
+		 * <pre>
+		 *     String[] lines = {"a,1", "b,3", "a,2"};
+		 *     Map&lt;String, List&lt;String&gt;&gt; m = mapGenerator(lines);
+		 * </pre>
+		 * m will contain the mappings "a" -> ["1", "2"] and "b" -> ["3"].
+		 *
+		 * @param lines the lines of a csv file with 2 columns
+		 *
+		 * @return a mapping of every value in the first column to all values of the right column that occur on the same line.
+		 */
+		private static Map<String, List<String>> mapGenerator(String[] lines) {
+			return Arrays.stream(lines).map(line -> line.split(",")).collect(groupingBy(parts -> parts[0], mapping(parts -> parts[1], toList())));
+		}
+
 		private Question getQuestion() {
 
-			List<String> entity = entityGenerator(this.map);
-			List<String> option = optionGenerator(entity, this.map);
+			String characterInQuestion = randomCharacter();
+			List<String> answers = generateAnswers(characterInQuestion);
 
-			idToLabel(entity, this.fairyTales);
-			idToLabel(option, this.fairyTales);
+			characterInQuestion = idToLabel.get(characterInQuestion);
+			answers = idToLabel(answers, idToLabel);
 
-			return questionLoad(entity, option);
+			String text = characterInQuestion + " kommt aus welchen folgenden Märchen?";
 
+			return new Question(text, ImmutableList.copyOf(answers));
 		}
 
-		private List<String> entityGenerator(Map<String, List<String>> map) {
-			String[] key = map.keySet().toArray(new String[0]);
+		private String randomCharacter() {
+			String[] characters = characterToFairyTales.keySet().toArray(new String[0]);
+			return characters[RANDOM.nextInt(characters.length)];
+		}
 
-			Random random = new Random();
+		private ImmutableList<String> generateAnswers(String correctAnswer) {
 
-			List<String> entityList = new ArrayList<>();
+			ArrayList<String> allCharacters = new ArrayList<>(characterToFairyTales.keySet());
 
-			while (entityList.size() < 4) {
+			Set<String> wrongAnswers = new HashSet<>(4);
 
-				boolean isNewOption = true;
-				String option = key[random.nextInt(key.length)];
-				for (String string : entityList) {
-					if (option.equals(string)) {
-						isNewOption = false;
-					}
+			List<String> fairyTalesWithCorrectCharacter = characterToFairyTales.get(correctAnswer);
+
+			while (wrongAnswers.size() < 3) {
+
+				String randomCharacter = allCharacters.get(RANDOM.nextInt(allCharacters.size()));
+				List<String> fairyTalesWithRandomCharacter = characterToFairyTales.get(randomCharacter);
+				String randomFairyTale = fairyTalesWithRandomCharacter.get(RANDOM.nextInt(fairyTalesWithRandomCharacter.size()));
+				if (fairyTalesWithCorrectCharacter.contains(randomFairyTale)) {
+					// dont put correct things in yet
+					continue;
 				}
-				if (isNewOption) {
-					entityList.add(option);
-				}
+				wrongAnswers.add(randomFairyTale);
 			}
 
-			return entityList;
+
+			ImmutableList.Builder<String> answers = new Builder<>();
+			// add the correct answer
+			answers.add(fairyTalesWithCorrectCharacter.get(RANDOM.nextInt(fairyTalesWithCorrectCharacter.size())));
+			answers.addAll(wrongAnswers);
+
+			return answers.build();
 		}
 
-		private List<String> optionGenerator(List<String> entityList, Map<String, List<String>> map) {
-
-			String[] key = map.keySet().toArray(new String[0]);
-
-			Random random = new Random();
-
-			List<String> optionList = new ArrayList<>();
-
-			optionList.add(map.get(entityList.get(0)).get(random.nextInt(map.get(entityList.get(0)).size())));
-
-			while (optionList.size() < 4) {
-
-				boolean isNewOption = true;
-
-				String keyValue = key[random.nextInt(key.length)];
-				String option = map.get(keyValue).get(random.nextInt(map.get(keyValue).size()));
-
-				for (String string : optionList) {
-					if (option.equals(string)) {
-						isNewOption = false;
-						break;
-					}
-				}
-				if (isNewOption) {
-					optionList.add(option);
-				}
-
-			}
-
-			return optionList;
+		private static List<String> idToLabel(List<String> list, Map<String, String> map) {
+			return list.stream().map(map::get).peek(e -> Objects.requireNonNull(e, "no label for " + e)).collect(toList());
 		}
-
-		private void idToLabel(List<String> list, Map<String, List<String>> map) {
-			for (int i = 0; i < list.size(); i++) {
-				if (map.containsKey(list.get(i))) {
-					list.set(i, map.get(list.get(i)).get(0));
-				}
-			}
-		}
-
-		private Question questionLoad(List<String> entitylist, List<String> optionlist) {
-
-			String text = entitylist.get(0) + " kommt aus welchen folfenden Märchen?";
-
-			return new Question(text, ImmutableList.copyOf(optionlist));
-		}
-
 	}
 
 }
