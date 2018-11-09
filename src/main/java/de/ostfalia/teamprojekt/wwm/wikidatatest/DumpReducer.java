@@ -46,7 +46,7 @@ public class DumpReducer implements AutoCloseable {
 				break;
 			case "maerchen":
 				predicate = new FairyTaleCharacterQuestionType()::itemRelevant;
-				outputFileName = "maerchenFigur.json";
+				outputFileName = "maerchen.json";
 				break;
 			case "general":
 				predicate = DumpReducer::generalFilter;
