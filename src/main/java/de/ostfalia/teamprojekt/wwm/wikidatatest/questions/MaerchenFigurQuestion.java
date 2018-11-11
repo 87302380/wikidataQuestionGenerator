@@ -2,7 +2,7 @@ package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 
 import com.google.common.collect.ImmutableList;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
-import org.apache.commons.io.FileUtils;
+//import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
@@ -114,7 +114,8 @@ public class MaerchenFigurQuestion implements QuestionType {
 
 		String[] dataRead(String input) throws IOException {
 			File file = new File(input);
-			String content = FileUtils.readFileToString(file, "UTF-8");
+			//String content = FileUtils.readFileToString(file, "UTF-8");
+			String content = "Hey fix deinen Code!";
 
 			return content.split("\n");
 		}
