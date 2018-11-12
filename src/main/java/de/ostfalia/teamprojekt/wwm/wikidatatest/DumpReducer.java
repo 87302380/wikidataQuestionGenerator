@@ -3,9 +3,9 @@ package de.ostfalia.teamprojekt.wwm.wikidatatest;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.LanguageFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.PredicateItemFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.StatementCleaner;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonQuestionType;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.FairyTaleCharacterQuestionType;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonQuestionType;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestion;
 import org.wikidata.wdtk.datamodel.interfaces.EntityDocumentProcessor;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
@@ -41,7 +41,7 @@ public class DumpReducer implements AutoCloseable {
 				outputFileName = "pokemon.json";
 				break;
 			case "borders":
-				predicate = new SharedBordersQuestionType()::itemRelevant;
+				predicate = new SharedBordersQuestion()::itemRelevant;
 				outputFileName = "borders.json";
 				break;
 			case "maerchen":

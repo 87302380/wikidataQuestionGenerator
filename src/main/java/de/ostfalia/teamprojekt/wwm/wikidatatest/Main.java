@@ -4,7 +4,7 @@ import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.FairyTaleCharacterQuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonQuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.QuestionType;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestionType;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,7 @@ public class Main {
 				inputFileName = "pokemon.json";
 				break;
 			case "borders":
-				questionType = new SharedBordersQuestionType();
+				questionType = new SharedBordersQuestion();
 				inputFileName = "borders.json";
 				break;
 			case "maerchen":
@@ -62,7 +62,7 @@ public class Main {
 	public void start() throws IOException {
 		reader.start();
 		Stream<Question> questions = questionType.generateQuestions();
-		questions.limit(10).forEach(System.out::println);
+		questions.limit(50).forEach(System.out::println);
 	}
 
 }
