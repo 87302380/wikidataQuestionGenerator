@@ -1,8 +1,8 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
-import org.apache.commons.compress.utils.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wikidata.wdtk.datamodel.implementation.ItemIdValueImpl;
@@ -17,12 +17,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -34,19 +32,13 @@ public class PokemonQuestionType implements QuestionType {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PokemonQuestionType.class);
 	private static final String PROPERTY_INSTANCE_OF = "P31";
-	private static final String PROPERTY_FROM_FICTIONAL_UNIVERSE = "P1080";
-	private static final String PROPERTY_DIFFERENT_FROM = "P1889";
-	private static final String PROPERTY_BULBAPEDIA_ARTICLE = "P4845";
-	private static final Set<String> IGNORE_STATEMENTS_WHEN_COUNTING = Sets.newHashSet(
-			PROPERTY_FROM_FICTIONAL_UNIVERSE, PROPERTY_DIFFERENT_FROM, PROPERTY_BULBAPEDIA_ARTICLE
-	);
-	private static final Comparator<ItemDocument> STATEMENT_COUNT_COMPARATOR = Comparator.comparingInt(PokemonQuestionType::numberOfKnowledgeStatements);
+	private static final Comparator<ItemDocument> STATEMENT_COUNT_COMPARATOR = Comparator.comparingInt(i -> Iterators.size(i.getAllStatements()));
 	private static final Random RANDOM = new Random();
 	private static final String WIKIDATA_SITE_URL = "http://www.wikidata.org/entity/";
 	private static final int ESTIMATED_NUMBER_OF_WELL_KNOWN_POKEMON_PER_TYPE = 50;
 
-	private Map<String, List<ItemDocument>> pokemonByType = new HashMap<>();
-	private Map<String, String> typeLabels = new HashMap<>();
+	private final Map<String, List<ItemDocument>> pokemonByType = new HashMap<>();
+	private final Map<String, String> typeLabels = new HashMap<>();
 
 	public PokemonQuestionType() {
 		try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream("pokemontypes.csv"), "UTF-8")) {
@@ -59,18 +51,6 @@ public class PokemonQuestionType implements QuestionType {
 				typeLabels.put(typeId, label);
 			}
 		}
-	}
-
-	private static int numberOfKnowledgeStatements(final ItemDocument itemDocument) {
-		int count = 0;
-		Iterator<Statement> it = itemDocument.getAllStatements();
-		while (it.hasNext()) {
-			Statement s = it.next();
-			if (!IGNORE_STATEMENTS_WHEN_COUNTING.contains(s.getStatementId())) {
-				count++;
-			}
-		}
-		return count;
 	}
 
 	@Override public boolean itemRelevant(final ItemDocument itemDocument) {
@@ -105,8 +85,7 @@ public class PokemonQuestionType implements QuestionType {
 				.distinct()
 				.collect(toList());
 
-		Supplier<Question> questions = new PokemonQuestionSupplier(wellKnownPokemon);
-		return Stream.generate(questions);
+		return Stream.generate(new PokemonQuestionSupplier(wellKnownPokemon));
 	}
 
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
@@ -121,7 +100,7 @@ public class PokemonQuestionType implements QuestionType {
 							if (pokemonWithThisType != null) {
 								// instance of something that is a subclass of pokemon
 								LOGGER.info("{}: {}", itemDocument.getLabels().get("de").getText(), pokemonTypeId);
-								pokemonByType.get(pokemonTypeId).add(itemDocument);
+								pokemonWithThisType.add(itemDocument);
 							}
 						}
 					}
@@ -134,7 +113,7 @@ public class PokemonQuestionType implements QuestionType {
 		private final ImmutableList<String> types;
 		private final List<ItemDocument> wellKnownPokemon;
 
-		public PokemonQuestionSupplier(final List<ItemDocument> wellKnownPokemon) {
+		private PokemonQuestionSupplier(final List<ItemDocument> wellKnownPokemon) {
 			types = ImmutableList.copyOf(typeLabels.keySet());
 			this.wellKnownPokemon = wellKnownPokemon;
 		}
