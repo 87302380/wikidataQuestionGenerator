@@ -92,7 +92,10 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 						if (v instanceof ItemIdValue) {
 							String fairyTaleId = ((ItemIdValue) v).getId();
 							LOGGER.info("{} is a character in {}", itemDocument.getLabels().get("de").getText(), fairyTaleId);
-							fairyTaleToCharacters.get(fairyTaleId).add(itemDocument.getLabels().get("de").getText());
+							Set<String> characters = fairyTaleToCharacters.get(fairyTaleId);
+							if (characters != null) {
+								characters.add(itemDocument.getLabels().get("de").getText());
+							}
 						}
 					}
 				}
