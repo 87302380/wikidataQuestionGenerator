@@ -5,7 +5,7 @@ import com.google.common.collect.Iterators;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wikidata.wdtk.datamodel.implementation.ItemIdValueImpl;
+import org.wikidata.wdtk.datamodel.helpers.Datamodel;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
 import org.wikidata.wdtk.datamodel.interfaces.Statement;
@@ -34,7 +34,6 @@ public class PokemonQuestionType implements QuestionType {
 	private static final String PROPERTY_INSTANCE_OF = "P31";
 	private static final Comparator<ItemDocument> STATEMENT_COUNT_COMPARATOR = Comparator.comparingInt(i -> Iterators.size(i.getAllStatements()));
 	private static final Random RANDOM = new Random();
-	private static final String WIKIDATA_SITE_URL = "http://www.wikidata.org/entity/";
 	private static final int ESTIMATED_NUMBER_OF_WELL_KNOWN_POKEMON_PER_TYPE = 50;
 
 	private final Map<String, List<ItemDocument>> pokemonByType = new HashMap<>();
@@ -124,7 +123,7 @@ public class PokemonQuestionType implements QuestionType {
 			String text = "Welches dieser Pokemon ist ein " + typeLabels.get(type) + "?";
 			String correctPokemon = pokemon.get(Math.min(pokemon.size() - 1, RANDOM.nextInt(ESTIMATED_NUMBER_OF_WELL_KNOWN_POKEMON_PER_TYPE))).findLabel("de");
 
-			Predicate<ItemDocument> pokemonHasType = i -> i.hasStatementValue(PROPERTY_INSTANCE_OF, new ItemIdValueImpl(type, WIKIDATA_SITE_URL));
+			Predicate<ItemDocument> pokemonHasType = i -> i.hasStatementValue(PROPERTY_INSTANCE_OF, Datamodel.makeWikidataItemIdValue(type));
 
 			List<String> wrongPokemon = RANDOM.ints(0, wellKnownPokemon.size())
 					.distinct()
