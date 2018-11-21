@@ -19,7 +19,8 @@ import java.util.function.Predicate;
 
 public class DumpReducer implements AutoCloseable {
 
-	private static final String INPUT_FILE_NAME = "results/reduced.json.gz"/*"wikidata-20181001-all.json.bz2" */;//TODO think about an optional parameter for full Dump
+//	private static final String INPUT_FILE_NAME = "wikidata-20181001-all.json.bz2";//TODO think about an optional parameter for full Dump
+	private static final String INPUT_FILE_NAME = "results/reduced.json.gz";
 
 	private final DumpReader reader;
 	private final DumpWriter writer;
@@ -50,7 +51,7 @@ public class DumpReducer implements AutoCloseable {
 				break;
 			case "general":
 				predicate = DumpReducer::generalFilter;
-				outputFileName = "reduced2.json.gz";
+				outputFileName = "reduced.json.gz";
 				break;
 			default:
 				throw new IllegalArgumentException("Bitte Argument übergeben!");

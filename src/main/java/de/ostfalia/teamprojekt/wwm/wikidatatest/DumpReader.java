@@ -23,7 +23,7 @@ public class DumpReader {
 
 	public DumpReader(String filename, EntityDocumentProcessor callback) {
 		dumpProcessingController = new DumpProcessingController("wikidatawiki");
-		dumpProcessingController.registerEntityDocumentProcessor(new OnlyEntityProcessor(new ProgressCountProcessor(callback)), null, true);
+		dumpProcessingController.registerEntityDocumentProcessor(new OnlyEntityAndPropertiesProcessor(new ProgressCountProcessor(callback)), null, true);
 		if (filename.endsWith(".bz2")) {
 			dumpFile = new Bzip2DumpFile(filename);
 		} else if (filename.endsWith(".json")) {
@@ -68,16 +68,20 @@ public class DumpReader {
 	/**
 	 * This classes processes only entities and ignores the other methods in {@link EntityDocumentProcessor}
 	 */
-	private static class OnlyEntityProcessor implements EntityDocumentProcessor {
+	private static class OnlyEntityAndPropertiesProcessor implements EntityDocumentProcessor {
 
 		private final EntityDocumentProcessor callback;
 
-		public OnlyEntityProcessor(EntityDocumentProcessor callback) {
+		public OnlyEntityAndPropertiesProcessor(EntityDocumentProcessor callback) {
 			this.callback = callback;
 		}
 
 		@Override public void processItemDocument(final ItemDocument itemDocument) {
 			callback.processItemDocument(itemDocument);
+		}
+
+		@Override public void processPropertyDocument(final PropertyDocument propertyDocument) {
+			callback.processPropertyDocument(propertyDocument);
 		}
 	}
 
