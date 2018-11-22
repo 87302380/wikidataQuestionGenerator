@@ -22,41 +22,52 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FairyTaleCharacterQuestionType.class);
 	private static final String PROPERTY_PRESENT_IN_WORK = "P1441";
+	private static final String PROPERTY_INSTANCE_OF = "P136";
 //	private static final String PROPERTY_CHARACTERS = "P674";
-	private static final String FAIRY_TALE_PATH = "fairyTaleResources/fairyTales.csv";
+//	private static final String FAIRY_TALE_PATH = "fairyTaleResources/fairyTales.csv";
 
 	private static final Map<String, Set<String>> fairyTaleToCharacters = new HashMap<>();
 	private static final Map<String, String> fairyTaleLabel = new HashMap<>();
+	private static final Set<String> genreProperty = new HashSet<>();
 
 	public FairyTaleCharacterQuestionType() {
-		if (fairyTaleToCharacters.isEmpty()) {
-			try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream(FAIRY_TALE_PATH), "UTF-8")) {
-				s.useDelimiter("\n");
-				while (s.hasNext()) {
-					String[] fairyTale = s.next().split(",");
-					fairyTaleToCharacters.put(fairyTale[0], new HashSet<>(1000));
-					fairyTaleLabel.put(fairyTale[0],fairyTale[1]);
-					s.nextLine();
-				}
-			}
-		}
+		addGenreProperty("Q699");
+		addGenreProperty("Q7832362");
+		addGenreProperty("Q20730955");
+
+//		if (fairyTaleToCharacters.isEmpty()) {
+//			try (Scanner s = new Scanner(getClass().getClassLoader().getResourceAsStream(FAIRY_TALE_PATH), "UTF-8")) {
+//				s.useDelimiter("\n");
+//				while (s.hasNext()) {
+//					String[] fairyTale = s.next().split(",");
+//					fairyTaleToCharacters.put(fairyTale[0], new HashSet<>(1000));
+//					fairyTaleLabel.put(fairyTale[0],fairyTale[1]);
+//					s.nextLine();
+//				}
+//			}
+//		}
+	}
+
+	private void addGenreProperty(String fairyEntity){
+		genreProperty.add(fairyEntity);
 	}
 
 	@Override public boolean itemRelevant(final ItemDocument itemDocument) {
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
 			if (sg.getProperty().getId().equals(PROPERTY_PRESENT_IN_WORK)) {
-				for (Statement s : sg.getStatements()) {
-					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
-						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
-						if (v instanceof ItemIdValue && fairyTaleToCharacters.containsKey(((ItemIdValue) v).getId())) {
+			//	for (Statement s : sg.getStatements()) {
+			//		if (s.getClaim().getMainSnak() instanceof ValueSnak) {
+			//			Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
+			//			if (v instanceof ItemIdValue && fairyTaleToCharacters.containsKey(((ItemIdValue) v).getId())) {
 							// german label might not exist
 							//LOGGER.log(Level.INFO, itemDocument.getLabels().get("de").getText() + ": " + ((ItemIdValue) v).getId());
-							LOGGER.info("{} is a character in {}", itemDocument.getEntityId().getId(), ((ItemIdValue) v).getId());
+			//				LOGGER.info("{} is a character in {}", itemDocument.getEntityId().getId(), ((ItemIdValue) v).getId());
 							return true;
-						}
-					}
-				}
+			//			}
+			//		}
+			//	}
 			}
+
 		}
 		return false;
 	}
@@ -85,6 +96,21 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 					}
 				}
 			}
+			if (sg.getProperty().getId().equals(PROPERTY_INSTANCE_OF)) {
+				for (Statement s : sg.getStatements()) {
+					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
+						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
+						if (v instanceof ItemIdValue) {
+							if (genreProperty.contains(((ItemIdValue) v).getId())){
+								fairyTaleToCharacters.put(s.getClaim().getSubject().getId()
+										, new HashSet<>(1000));
+								fairyTaleLabel.put(s.getClaim().getSubject().getId()
+										,itemDocument.getLabels().get("de").getText());
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -92,7 +118,7 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 
 		private static final Random RANDOM = new Random();
 
-		public QuestionGenerator(){
+		QuestionGenerator(){
 			ArrayList<String> emptyKeyValue = new ArrayList<>();
 			for (String key : fairyTaleToCharacters.keySet()){
 				if (fairyTaleToCharacters.get(key).isEmpty()){
@@ -127,7 +153,6 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 			String fairyTaleInQuestion = randomFairyTale();
 			List<String> answers = generateAnswers(fairyTaleInQuestion);
 
-		//	characterInQuestion = idToLabel.get(characterInQuestion);
 			answers = idToLabel(answers, fairyTaleLabel);
 
 			Iterator character = fairyTaleToCharacters.get(fairyTaleInQuestion).iterator();

@@ -35,7 +35,7 @@ public class Main {
 				break;
 			case "maerchen":
 				questionType = new FairyTaleCharacterQuestionType();
-				inputFileName = "maerchenFigur.json";
+				inputFileName = "maerchen.json";
 				break;
 			default:
 				throw new IllegalArgumentException("Bitte Argument übergeben!");
