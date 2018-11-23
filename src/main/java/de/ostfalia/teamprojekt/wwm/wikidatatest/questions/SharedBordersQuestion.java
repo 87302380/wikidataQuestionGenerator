@@ -30,34 +30,13 @@ public class SharedBordersQuestion implements QuestionType {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SharedBordersQuestion.class);
 	private static final String PROPERTY_INSTANCE_OF = "P31";
-	private static final String PROPERTY_DISSOLVED_OR_ABOLISHED = "P576";
 	private static final String PROPERTY_COUNTRY = "Q6256";
 	private static final String PROPERTY_SHARES_BORDER = "P47";
 	private static final Random RANDOM = new Random();
 	private final Set<Country> countries = new HashSet<>();
 
-	@Override
-	public boolean itemRelevant(ItemDocument itemDocument) {
-		for (StatementGroup sg : itemDocument.getStatementGroups()) {
-
-			if (sg.getProperty().getId().equals(PROPERTY_DISSOLVED_OR_ABOLISHED)) {
-				return false;
-			}
-
-			if (!sg.getProperty().getId().equals(PROPERTY_INSTANCE_OF)) {
-				continue;
-			}
-
-			for (Statement s : sg.getStatements()) {
-				if (s.getClaim().getMainSnak() instanceof ValueSnak) {
-					Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
-					if (v instanceof ItemIdValue && ((ItemIdValue) v).getId().equals(PROPERTY_COUNTRY)) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
+	@Override public boolean canGenerateQuestions() {
+		return true;
 	}
 
 	@Override

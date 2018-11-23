@@ -3,9 +3,6 @@ package de.ostfalia.teamprojekt.wwm.wikidatatest;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.LanguageFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.PredicateItemFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.StatementCleaner;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.FairyTaleCharacterQuestionType;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonQuestionType;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestion;
 import org.wikidata.wdtk.datamodel.interfaces.EntityDocumentProcessor;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
@@ -15,12 +12,16 @@ import org.wikidata.wdtk.datamodel.interfaces.Value;
 import org.wikidata.wdtk.datamodel.interfaces.ValueSnak;
 
 import java.io.IOException;
-import java.util.function.Predicate;
 
 public class DumpReducer implements AutoCloseable {
 
-//	private static final String INPUT_FILE_NAME = "wikidata-20181001-all.json.bz2";//TODO think about an optional parameter for full Dump
 	private static final String INPUT_FILE_NAME = "results/reduced.json.gz";
+	private static final String PROPERTY_INSTANCE_OF = "P31";
+	private static final String ITEM_GENE = "Q7187";
+	private static final String ITEM_PROTEIN = "Q8054";
+	private static final String ITEM_WIKIMEDIA_DISAMBIGUATION_PAGE = "Q4167410";
+	private static final String ITEM_SCHOLARLY_ARTICLE = "Q13442814";
+
 
 	private final DumpReader reader;
 	private final DumpWriter writer;
@@ -34,36 +35,17 @@ public class DumpReducer implements AutoCloseable {
 	 * @throws IOException if there is a problem opening the output file
 	 */
 	private DumpReducer(String arg) throws IOException {
-		Predicate<ItemDocument> predicate;
-		String outputFileName;
-		switch (arg) {
-			case "pokemon":
-				predicate = new PokemonQuestionType()::itemRelevant;
-				outputFileName = "pokemon.json";
-				break;
-			case "borders":
-				predicate = new SharedBordersQuestion()::itemRelevant;
-				outputFileName = "borders.json";
-				break;
-			case "maerchen":
-				predicate = new FairyTaleCharacterQuestionType()::itemRelevant;
-				outputFileName = "maerchen.json";
-				break;
-			case "general":
-				predicate = DumpReducer::generalFilter;
-				outputFileName = "reduced.json.gz";
-				break;
-			default:
-				throw new IllegalArgumentException("Bitte Argument übergeben!");
+		if (!arg.equals("general")) {
+			throw new IllegalArgumentException("Bitte Argument übergeben!");
 		}
 
-		this.writer = new DumpWriter(outputFileName);
+		this.writer = new DumpWriter("reduced2.json.gz");
 		EntityDocumentProcessor processor =
 				new PredicateItemFilter(
 						new LanguageFilter(
 								new StatementCleaner(this.writer)
 						),
-						predicate
+						DumpReducer::generalFilter
 				);
 
 		this.reader = new DumpReader(INPUT_FILE_NAME, processor);
@@ -87,14 +69,20 @@ public class DumpReducer implements AutoCloseable {
 	}
 
 	private static boolean generalFilter(final ItemDocument itemDocument) {
-		// ignore scholarly articles
+		// ignore some stuff
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
-			if (sg.getProperty().getId().equals("P31")) {
+			if (sg.getProperty().getId().equals(PROPERTY_INSTANCE_OF)) {
 				for (Statement s : sg.getStatements()) {
 					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
 						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
-						// scholarly article
-						if (v instanceof ItemIdValue && ((ItemIdValue) v).getId().equals("Q13442814")) {
+						if (!(v instanceof ItemIdValue)) {
+							return false;
+						}
+						ItemIdValue value = (ItemIdValue) v;
+						if (value.getId().equals(ITEM_GENE)
+						    || value.getId().equals(ITEM_PROTEIN)
+						    || value.getId().equals(ITEM_WIKIMEDIA_DISAMBIGUATION_PAGE)
+						    || value.getId().equals(ITEM_SCHOLARLY_ARTICLE)) {
 							return false;
 						}
 					}
