@@ -2,7 +2,7 @@ package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.FairyTaleCharacterQuestionType;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.PokemonQuestionType;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SubclassOfQuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.QuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestion;
 import org.slf4j.Logger;
@@ -14,20 +14,19 @@ import java.util.stream.Stream;
 public class Main {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
-	private final DumpReader reader;
+
 	private final QuestionType questionType;
+	private final String inputFileName;
 
 	/**
 	 * Constructor. Initializes various helper objects we use for the JSON
 	 * serialization, and opens the file that we want to write to.
 	 */
 	private Main(String argument) {
-		String inputFileName;
-
 		switch (argument) {
 			case "pokemon":
-				questionType = new PokemonQuestionType();
-				inputFileName = "pokemon.json";
+				questionType = new SubclassOfQuestionType();
+				inputFileName = "reduced2.json.gz";
 				break;
 			case "borders":
 				questionType = new SharedBordersQuestion();
@@ -40,8 +39,6 @@ public class Main {
 			default:
 				throw new IllegalArgumentException("Bitte Argument übergeben!");
 		}
-
-		this.reader = new DumpReader("results/" + inputFileName, questionType);
 	}
 
 	/**
@@ -60,7 +57,11 @@ public class Main {
 	}
 
 	public void start() throws IOException {
-		reader.start();
+		do {
+			questionType.onStartDumpReading();
+			final DumpReader reader = new DumpReader("results/" + inputFileName, questionType);
+			reader.start();
+		} while (!questionType.canGenerateQuestions());
 		Stream<Question> questions = questionType.generateQuestions();
 		questions.limit(50).forEach(System.out::println);
 	}
