@@ -1,5 +1,6 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
+import com.google.common.collect.ImmutableList;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.LanguageFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.PredicateItemFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.StatementCleaner;
@@ -8,8 +9,6 @@ import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
 import org.wikidata.wdtk.datamodel.interfaces.Statement;
 import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
-import org.wikidata.wdtk.datamodel.interfaces.Value;
-import org.wikidata.wdtk.datamodel.interfaces.ValueSnak;
 
 import java.io.IOException;
 
@@ -19,8 +18,13 @@ public class DumpReducer implements AutoCloseable {
 	private static final String PROPERTY_INSTANCE_OF = "P31";
 	private static final String ITEM_GENE = "Q7187";
 	private static final String ITEM_PROTEIN = "Q8054";
+	private static final String ITEM_CHEMICAL_COMPOUND = "Q11173";
 	private static final String ITEM_WIKIMEDIA_DISAMBIGUATION_PAGE = "Q4167410";
 	private static final String ITEM_SCHOLARLY_ARTICLE = "Q13442814";
+
+	private static final ImmutableList<String> BLACKLIST = ImmutableList.of(
+			ITEM_GENE, ITEM_PROTEIN, ITEM_CHEMICAL_COMPOUND, ITEM_WIKIMEDIA_DISAMBIGUATION_PAGE, ITEM_SCHOLARLY_ARTICLE
+	);
 
 
 	private final DumpReader reader;
@@ -39,7 +43,7 @@ public class DumpReducer implements AutoCloseable {
 			throw new IllegalArgumentException("Bitte Argument übergeben!");
 		}
 
-		this.writer = new DumpWriter("reduced2.json.gz");
+		this.writer = new DumpWriter("reduced.json.gz");
 		EntityDocumentProcessor processor =
 				new PredicateItemFilter(
 						new LanguageFilter(
@@ -73,20 +77,14 @@ public class DumpReducer implements AutoCloseable {
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
 			if (sg.getProperty().getId().equals(PROPERTY_INSTANCE_OF)) {
 				for (Statement s : sg.getStatements()) {
-					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
-						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
-						if (!(v instanceof ItemIdValue)) {
-							return false;
-						}
-						ItemIdValue value = (ItemIdValue) v;
-						if (value.getId().equals(ITEM_GENE)
-						    || value.getId().equals(ITEM_PROTEIN)
-						    || value.getId().equals(ITEM_WIKIMEDIA_DISAMBIGUATION_PAGE)
-						    || value.getId().equals(ITEM_SCHOLARLY_ARTICLE)) {
+					if (s.getValue() instanceof ItemIdValue) {
+						ItemIdValue value = (ItemIdValue) s.getValue();
+						if (BLACKLIST.contains(value.getId())) {
 							return false;
 						}
 					}
 				}
+				return true;
 			}
 		}
 		return true;
