@@ -22,11 +22,12 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FairyTaleCharacterQuestionType.class);
 	private static final String PROPERTY_PRESENT_IN_WORK = "P1441";
-	private static final String PROPERTY_INSTANCE_OF = "P136";
+	private static final String PROPERTY_GENRE = "P136";
 //	private static final String PROPERTY_CHARACTERS = "P674";
 //	private static final String FAIRY_TALE_PATH = "fairyTaleResources/fairyTales.csv";
 
 	private static final Map<String, Set<String>> fairyTaleToCharacters = new HashMap<>();
+	private static final Map<String, Set<String>> charactersToFairyTale = new HashMap<>();
 	private static final Map<String, String> fairyTaleLabel = new HashMap<>();
 	private static final Set<String> genreProperty = new HashSet<>();
 
@@ -88,15 +89,21 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 						if (v instanceof ItemIdValue) {
 							String fairyTaleId = ((ItemIdValue) v).getId();
 							LOGGER.info("{} is a character in {}", itemDocument.getLabels().get("de").getText(), fairyTaleId);
-							Set<String> characters = fairyTaleToCharacters.get(fairyTaleId);
-							if (characters != null) {
-								characters.add(itemDocument.getLabels().get("de").getText());
+							if (charactersToFairyTale.containsKey(fairyTaleId)){
+								Set<String> workIn = charactersToFairyTale.get(fairyTaleId);
+								workIn.add(itemDocument.getEntityId().getId());
+							}else {
+								Set<String> workIn = new HashSet<>();
+								workIn.add(fairyTaleId);
+								charactersToFairyTale.put(itemDocument.getEntityId().getId(),workIn);
+								//	characters.add(itemDocument.getLabels().get("de").getText());
 							}
+
 						}
 					}
 				}
 			}
-			if (sg.getProperty().getId().equals(PROPERTY_INSTANCE_OF)) {
+			if (sg.getProperty().getId().equals(PROPERTY_GENRE)) {
 				for (Statement s : sg.getStatements()) {
 					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
 						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
@@ -119,6 +126,16 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 		private static final Random RANDOM = new Random();
 
 		QuestionGenerator(){
+
+
+			for (String key : charactersToFairyTale.keySet()){
+				for (String workIn:charactersToFairyTale.get(key)){
+					if (fairyTaleToCharacters.containsKey(workIn)){
+						Set<String> characters = fairyTaleToCharacters.get(workIn);
+						characters.add(key);
+					}
+				}
+			}
 			ArrayList<String> emptyKeyValue = new ArrayList<>();
 			for (String key : fairyTaleToCharacters.keySet()){
 				if (fairyTaleToCharacters.get(key).isEmpty()){
@@ -153,7 +170,7 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 			String fairyTaleInQuestion = randomFairyTale();
 			List<String> answers = generateAnswers(fairyTaleInQuestion);
 
-			answers = idToLabel(answers, fairyTaleLabel);
+	//		answers = idToLabel(answers, fairyTaleLabel);
 
 			Iterator character = fairyTaleToCharacters.get(fairyTaleInQuestion).iterator();
 			String text = character.next() + " kommt aus welchen folgenden Märchen?";
