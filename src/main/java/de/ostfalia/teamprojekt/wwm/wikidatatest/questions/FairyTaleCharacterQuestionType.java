@@ -53,24 +53,8 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 		genreProperty.add(fairyEntity);
 	}
 
-	@Override public boolean itemRelevant(final ItemDocument itemDocument) {
-		for (StatementGroup sg : itemDocument.getStatementGroups()) {
-			if (sg.getProperty().getId().equals(PROPERTY_PRESENT_IN_WORK)) {
-			//	for (Statement s : sg.getStatements()) {
-			//		if (s.getClaim().getMainSnak() instanceof ValueSnak) {
-			//			Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
-			//			if (v instanceof ItemIdValue && fairyTaleToCharacters.containsKey(((ItemIdValue) v).getId())) {
-							// german label might not exist
-							//LOGGER.log(Level.INFO, itemDocument.getLabels().get("de").getText() + ": " + ((ItemIdValue) v).getId());
-			//				LOGGER.info("{} is a character in {}", itemDocument.getEntityId().getId(), ((ItemIdValue) v).getId());
-							return true;
-			//			}
-			//		}
-			//	}
-			}
-
-		}
-		return false;
+	@Override public boolean canGenerateQuestions() {
+		return true;
 	}
 
 	@Override public Stream<Question> generateQuestions() {
