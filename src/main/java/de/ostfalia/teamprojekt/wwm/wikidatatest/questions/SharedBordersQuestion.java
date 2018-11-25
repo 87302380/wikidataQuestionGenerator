@@ -20,7 +20,7 @@ public class SharedBordersQuestion implements QuestionType {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SharedBordersQuestion.class);
 //	private static final String PROPERTY_INSTANCE_OF = "P31";
 //	private static final String PROPERTY_COUNTRY = "Q6256";
-	private static final String PROPERTY_SHARES_BORDER = "P47";
+//	private static final String PROPERTY_SHARES_BORDER = "P47";
 	private static final String PROPERTY_CONSTRAINT = "P2302";
 	private static final String ITEM_TYPE_CONSTRAINT = "Q21503250";
 	private static final String ITEM_VALUE_TYPE_CONSTRAINT = "Q21510865";
