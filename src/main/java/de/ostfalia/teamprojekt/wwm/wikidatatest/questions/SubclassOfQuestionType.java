@@ -1,11 +1,9 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wikidata.wdtk.datamodel.helpers.Datamodel;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
 import org.wikidata.wdtk.datamodel.interfaces.Statement;
@@ -13,21 +11,22 @@ import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
 import org.wikidata.wdtk.datamodel.interfaces.Value;
 import org.wikidata.wdtk.datamodel.interfaces.ValueSnak;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 public class SubclassOfQuestionType implements QuestionType {
@@ -35,52 +34,58 @@ public class SubclassOfQuestionType implements QuestionType {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SubclassOfQuestionType.class);
 	private static final String PROPERTY_INSTANCE_OF = "P31";
 	private static final String PROPERTY_SUBCLASS_OF = "P279";
-	private static final Comparator<ItemDocument> STATEMENT_COUNT_COMPARATOR = Comparator.comparingInt(i -> Iterators.size(i.getAllStatements()));
 	private static final Random RANDOM = new Random();
-	private static final int ESTIMATED_NUMBER_OF_WELL_KNOWN_POKEMON_PER_TYPE = 50;
+	private static final String LANGUAGE = "de";
 
-	private Set<Category> categories = new HashSet<>();
-	private final Map<String, List<ItemDocument>> pokemonByType = new HashMap<>();
-	private final Map<String, String> typeLabels = new HashMap<>();
+	private Map<String, Category> categories = new HashMap<>();
+	private Map<ItemIdValue, SubCategory> subCategoriesById;
 	private int numberOfDumpReading = 0;
 
 	public SubclassOfQuestionType() { }
 
 	@Override public boolean canGenerateQuestions() {
-		return numberOfDumpReading == 2;
-	}
-
-	@Override public Stream<Question> generateQuestions() {
-		for (final List<ItemDocument> pokemon : pokemonByType.values()) {
-			pokemon.sort(STATEMENT_COUNT_COMPARATOR.reversed());
-		}
-
-		List<ItemDocument> wellKnownPokemon = pokemonByType.values()
-				.stream()
-				.map(Collection::stream)
-				.map(x -> x.limit(ESTIMATED_NUMBER_OF_WELL_KNOWN_POKEMON_PER_TYPE))
-				.flatMap(Function.identity())
-				.distinct()
-				.collect(toList());
-
-		return Stream.generate(new PokemonQuestionSupplier(wellKnownPokemon));
+		return numberOfDumpReading == 3;
 	}
 
 	@Override public void onStartDumpReading() {
 		numberOfDumpReading++;
+		LOGGER.info("Dump reading nr. {}", numberOfDumpReading);
 		if (numberOfDumpReading == 2) {
+			subCategoriesById = categories.values().stream()
+					.flatMap(c -> c.subCategories.stream())
+					.collect(toMap(sc -> sc.itemDocument.getEntityId(), Function.identity(), (sc1, sc2) -> sc1));
+		} else if (numberOfDumpReading == 3) {
 			LOGGER.info("found {} categories", categories.size());
-			categories = categories.stream().filter(c -> c.subCategories.size() >= 2).collect(toSet());
+			categories.values().forEach(c -> c.subCategories.removeIf(s -> s.itemDocument.findLabel(LANGUAGE) == null));
+			categories = categories.entrySet().stream().filter(e -> e.getValue().subCategories.size() >= 2).collect(toMap(Entry::getKey, Entry::getValue));
 			LOGGER.info("found {} categories with more than 2 subcategories", categories.size());
-			LOGGER.info("found {} categories without an itemdocument", categories.stream().filter(c -> c.itemDocument == null).count());
-			categories.stream().filter(c -> c.itemDocument != null).sorted(Comparator.comparingInt(c -> c.subCategories.size())).limit(1000).forEachOrdered(c -> System.out.println(c.itemDocument.findLabel("de")));
+			categories = categories.entrySet().stream().filter(e -> e.getValue().itemDocument != null).collect(toMap(Entry::getKey, Entry::getValue));
+			LOGGER.info("{} of those categories have an itemdocument", categories.size());
+			categories.values()
+					.stream()
+					.sorted(Comparator.comparingInt((Category c) -> c.subCategories.size()).reversed())
+					.limit(20)
+					.forEachOrdered(c -> System.out.println(c.itemDocument.findLabel(LANGUAGE) + " has " + c.subCategories.size() + " subcategories"));
 		}
 	}
 
+	@Override public Stream<Question> generateQuestions() {
+		for (Iterator<Category> iterator = categories.values().iterator(); iterator.hasNext(); ) {
+			final Category c = iterator.next();
+			c.subCategories.removeIf(sc -> sc.instances.size() == 0);
+			if (c.subCategories.isEmpty()) {
+				iterator.remove();
+			}
+		}
+		LOGGER.info("{} of those have at least one non-empty subcategory", categories.size());
+
+		return Stream.generate(new SubclassOfQuestionSupplier());
+	}
+
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
+
 		if (numberOfDumpReading == 1) {
-			Optional<Category> category = categories.stream().filter(c -> c.getId() == itemDocument.getEntityId()).findAny();
-			category.ifPresent(c -> c.itemDocument = itemDocument);
+			// find things that have the property "subclass of"
 			for (StatementGroup sg : itemDocument.getStatementGroups()) {
 				if (sg.getProperty().getId().equals(PROPERTY_SUBCLASS_OF)) {
 					Set<Category> parents = new HashSet<>();
@@ -91,26 +96,34 @@ public class SubclassOfQuestionType implements QuestionType {
 								ItemIdValue value = ((ItemIdValue) v);
 								Category parent = findOrCreateCategoryWithId(value);
 								parents.add(parent);
-//								LOGGER.info("{} is subclass of {}", itemDocument.getLabels().get("de").getText(), value);
 							}
 						}
 					}
 					SubCategory subCategoryForItemDocument = new SubCategory();
 					subCategoryForItemDocument.itemDocument = itemDocument;
-					subCategoryForItemDocument.parents = parents;
 					parents.forEach(p -> p.subCategories.add(subCategoryForItemDocument));
 				}
 			}
 		} else if (numberOfDumpReading == 2) {
+			// store the itemDocument for the categories (needed for labels later)
+			Category category = categories.get(itemDocument.getEntityId().getId());
+			if (category != null) {
+				category.itemDocument = itemDocument;
+			}
+		} else if (numberOfDumpReading == 3) {
+			// store items that are instance of one of our subcategories
 			for (StatementGroup sg : itemDocument.getStatementGroups()) {
 				if (sg.getProperty().getId().equals(PROPERTY_INSTANCE_OF)) {
 					for (Statement s : sg.getStatements()) {
-						if (s.getClaim().getMainSnak() instanceof ValueSnak) {
-							Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
-							if (v instanceof ItemIdValue) {
-								ItemIdValue value = ((ItemIdValue) v);
-								Optional<SubCategory> subCategory = findSubCategory(value);
-								subCategory.ifPresent(sc -> sc.instances.add(itemDocument));
+						Value v = s.getValue();
+						if (v instanceof ItemIdValue) {
+							ItemIdValue value = ((ItemIdValue) v);
+							SubCategory subCategory = subCategoriesById.get(value);
+							if (subCategory != null) {
+								String germanLabel = itemDocument.findLabel(LANGUAGE);
+								if (germanLabel != null) {
+									subCategory.instances.add(germanLabel);
+								}
 							}
 						}
 					}
@@ -120,50 +133,76 @@ public class SubclassOfQuestionType implements QuestionType {
 	}
 
 	private Category findOrCreateCategoryWithId(final ItemIdValue idValue) {
-		Optional<Category> optCategory = categories.stream().filter(c -> c.getId().equals(idValue)).findFirst();
-		if (optCategory.isPresent()) {
-			return optCategory.get();
-		} else {
-			Category c = new Category();
-			c.id = idValue;
-			categories.add(c);
-			return c;
+		Category category = categories.get(idValue.getId());
+		if (category == null) {
+			category = new Category();
+			categories.put(idValue.getId(), category);
 		}
-	}
-
-	private Optional<SubCategory> findSubCategory(final ItemIdValue value) {
-		return categories.stream().flatMap(c -> c.subCategories.stream()).filter(s -> s.itemDocument.getEntityId().equals(value)).findFirst();
+		return category;
 	}
 
 
+	public class SubclassOfQuestionSupplier implements Supplier<Question> {
+		private final List<Category> categoryList;
 
-
-	private class PokemonQuestionSupplier implements Supplier<Question> {
-		private final ImmutableList<String> types;
-		private final List<ItemDocument> wellKnownPokemon;
-
-		private PokemonQuestionSupplier(final List<ItemDocument> wellKnownPokemon) {
-			types = ImmutableList.copyOf(typeLabels.keySet());
-			this.wellKnownPokemon = wellKnownPokemon;
+		private SubclassOfQuestionSupplier() {
+			categoryList = new ArrayList<>(categories.values());
+			if (categoryList.isEmpty()) {
+				throw new IllegalStateException();
+			}
 		}
 
 		@Override public Question get() {
-			String type = types.get(RANDOM.nextInt(types.size()));
-			List<ItemDocument> pokemon = pokemonByType.get(type);
-			String text = "Welches dieser Pokemon ist ein " + typeLabels.get(type) + "?";
-			String correctPokemon = pokemon.get(Math.min(pokemon.size() - 1, RANDOM.nextInt(ESTIMATED_NUMBER_OF_WELL_KNOWN_POKEMON_PER_TYPE))).findLabel("de");
+			String text;
+			String correctAnswer;
+			List<String> wrongAnswers;
 
-			Predicate<ItemDocument> pokemonHasType = i -> i.hasStatementValue(PROPERTY_INSTANCE_OF, Datamodel.makeWikidataItemIdValue(type));
+			do {
+				Category randomCategory = categoryList.get(RANDOM.nextInt(categoryList.size()));
+				List<SubCategory> subCategories = new ArrayList<>(randomCategory.subCategories);
+				if (subCategories.isEmpty()) {
+					continue;
+				}
 
-			List<String> wrongPokemon = RANDOM.ints(0, wellKnownPokemon.size())
-					.distinct()
-					.mapToObj(wellKnownPokemon::get)
-					.filter(pokemonHasType.negate())
-					.limit(3)
-					.map(i -> i.findLabel("de"))
-					.collect(toList());
+				SubCategory randomSubCategory = subCategories.get(RANDOM.nextInt(subCategories.size()));
+				List<String> correctAnswers = new ArrayList<>(randomSubCategory.instances);
+				if (correctAnswers.isEmpty()) {
+					continue;
+				}
 
-			ImmutableList<String> answers = ImmutableList.<String>builder().add(correctPokemon).addAll(wrongPokemon).build();
+				correctAnswer = correctAnswers.get(RANDOM.nextInt(correctAnswers.size()));
+
+				String subCategoryLabel = randomSubCategory.itemDocument.findLabel("de");
+				if (correctAnswer.contains(subCategoryLabel)) {
+					continue;
+				}
+
+				text = "Welches ist ein " + subCategoryLabel + "?";
+
+				final String finalCorrectAnswer = correctAnswer;
+				List<String> allWrongAnswers = subCategories.stream()
+						.filter(c -> c != randomSubCategory)
+						.flatMap(c -> c.instances.stream())
+						.filter(a -> !a.equals(finalCorrectAnswer))
+						.distinct()
+						.collect(toList());
+
+				if (allWrongAnswers.size() < 3) {
+					continue;
+				} else if (allWrongAnswers.size() == 3) {
+					wrongAnswers = allWrongAnswers;
+				} else {
+					wrongAnswers = RANDOM.ints(0, allWrongAnswers.size())
+							.distinct()
+							.limit(3)
+							.mapToObj(allWrongAnswers::get)
+							.collect(toList());
+				}
+				break;
+
+			} while (true);
+
+			ImmutableList<String> answers = ImmutableList.<String>builder().add(correctAnswer).addAll(wrongAnswers).build();
 			return new Question(text, answers);
 		}
 	}
@@ -171,25 +210,16 @@ public class SubclassOfQuestionType implements QuestionType {
 
 
 
-	private class Category {
+	public static class Category {
 		private final Set<SubCategory> subCategories = new HashSet<>();
 		private ItemDocument itemDocument;
-		private ItemIdValue id; // only used when we haven't encountered this
-		private ItemIdValue getId() {
-			return id == null ? itemDocument.getEntityId() : id;
-		}
 	}
 
 
 
 
-	private class SubCategory {
-		private final Set<ItemDocument> instances = new HashSet<>();
+	public static class SubCategory {
+		private final Set<String> instances = new HashSet<>();
 		private ItemDocument itemDocument;
-		private Set<Category> parents;
-
-		private Set<SubCategory> siblings() {
-			return parents.stream().flatMap(c -> c.subCategories.stream()).filter(c -> c != this).collect(toSet());
-		}
 	}
 }

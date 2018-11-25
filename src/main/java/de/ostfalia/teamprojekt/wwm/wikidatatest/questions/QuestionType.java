@@ -10,7 +10,7 @@ public interface QuestionType extends EntityDocumentProcessor {
 
 	boolean canGenerateQuestions();
 
-	Stream<Question> generateQuestions() throws IOException;
-
 	default void onStartDumpReading() {}
+
+	Stream<Question> generateQuestions() throws IOException;
 }
