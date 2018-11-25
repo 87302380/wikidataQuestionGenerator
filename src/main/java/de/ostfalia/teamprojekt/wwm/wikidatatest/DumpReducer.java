@@ -1,6 +1,6 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.LanguageFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.PredicateItemFilter;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.processors.StatementCleaner;
@@ -16,14 +16,24 @@ public class DumpReducer implements AutoCloseable {
 
 	private static final String INPUT_FILE_NAME = "results/reduced.json.gz";
 	private static final String PROPERTY_INSTANCE_OF = "P31";
+	private static final String ITEM_STAR = "Q523";
 	private static final String ITEM_GENE = "Q7187";
 	private static final String ITEM_PROTEIN = "Q8054";
 	private static final String ITEM_CHEMICAL_COMPOUND = "Q11173";
+	private static final String ITEM_SUBSTELLAR_OBJECT = "Q3132741";
 	private static final String ITEM_WIKIMEDIA_DISAMBIGUATION_PAGE = "Q4167410";
 	private static final String ITEM_SCHOLARLY_ARTICLE = "Q13442814";
+	private static final String ITEM_CALENDAR_DAY_OF_A_GIVEN_YEAR = "Q47150325";
 
-	private static final ImmutableList<String> BLACKLIST = ImmutableList.of(
-			ITEM_GENE, ITEM_PROTEIN, ITEM_CHEMICAL_COMPOUND, ITEM_WIKIMEDIA_DISAMBIGUATION_PAGE, ITEM_SCHOLARLY_ARTICLE
+	private static final ImmutableSet<String> BLACKLIST = ImmutableSet.of(
+			ITEM_STAR,
+			ITEM_GENE,
+			ITEM_PROTEIN,
+			ITEM_CHEMICAL_COMPOUND,
+			ITEM_SUBSTELLAR_OBJECT,
+			ITEM_WIKIMEDIA_DISAMBIGUATION_PAGE,
+			ITEM_SCHOLARLY_ARTICLE,
+			ITEM_CALENDAR_DAY_OF_A_GIVEN_YEAR
 	);
 
 
