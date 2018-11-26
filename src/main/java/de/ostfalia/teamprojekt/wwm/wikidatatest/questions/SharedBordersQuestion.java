@@ -1,25 +1,15 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 
 import com.google.common.collect.ImmutableList;
-//import com.google.common.collect.Iterators;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.wikidata.wdtk.datamodel.interfaces.*;
-
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-//import static java.util.stream.Collectors.toList;
-
 
 public class SharedBordersQuestion implements QuestionType {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SharedBordersQuestion.class);
-//	private static final String PROPERTY_INSTANCE_OF = "P31";
-//	private static final String PROPERTY_COUNTRY = "Q6256";
-//	private static final String PROPERTY_SHARES_BORDER = "P47";
 	private static final String PROPERTY_CONSTRAINT = "P2302";
 	private static final String ITEM_TYPE_CONSTRAINT = "Q21503250";
 	private static final String ITEM_VALUE_TYPE_CONSTRAINT = "Q21510865";
@@ -27,24 +17,8 @@ public class SharedBordersQuestion implements QuestionType {
 	private static final String PROPERTY_CLASS_CONSTRAINT = "P2308";
 	private final Map<String, ItemDocument> itemMap = new HashMap<>();
 	private final ArrayList<PropertyDocument> propertyList = new ArrayList<>();
-	private int counter = 0;
 
-//	private static Set<ItemIdValue> getNeighbours(ItemDocument country) {
-//		Set<ItemIdValue> neighbours = new HashSet<>();
-//		for (StatementGroup sg : country.getStatementGroups()) {
-//			if (sg.getProperty().getId().equals(PROPERTY_SHARES_BORDER)) {
-//				for (Statement s : sg.getStatements()) {
-//					if (s.getClaim().getMainSnak() instanceof ValueSnak) {
-//						Value v = ((ValueSnak) s.getClaim().getMainSnak()).getValue();
-//						if (v instanceof ItemIdValue) {
-//							neighbours.add((ItemIdValue) v);
-//						}
-//					}
-//				}
-//			}
-//		}
-//		return neighbours;
-//	}
+	private int counter = 0;
 
 	@Override
 	public void onStartDumpReading() {
@@ -116,7 +90,7 @@ public class SharedBordersQuestion implements QuestionType {
 				if (!sg.getProperty().getId().equals(propertyDocument.getEntityId().getId())) {
 					continue;
 				}
-				itemMap.put(itemDocument.getEntityId().getId(), itemDocument);
+				itemMap.put(itemDocument.getEntityId().getId(),itemDocument);
 				return;
 			}
 		}
