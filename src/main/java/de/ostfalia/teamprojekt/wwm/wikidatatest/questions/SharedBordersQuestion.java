@@ -3,7 +3,6 @@ package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 import com.google.common.collect.ImmutableList;
 //import com.google.common.collect.Iterators;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
-import org.apache.commons.collections4.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wikidata.wdtk.datamodel.interfaces.*;
@@ -25,8 +24,9 @@ public class SharedBordersQuestion implements QuestionType {
 	private static final String ITEM_TYPE_CONSTRAINT = "Q21503250";
 	private static final String ITEM_VALUE_TYPE_CONSTRAINT = "Q21510865";
 	private static final Random RANDOM = new Random();
+	private static final String PROPERTY_CLASS_CONSTRAINT = "P2308";
 	private final Map<String, ItemDocument> itemMap = new HashMap<>();
-	private ArrayList<PropertyDocument> propertyList = new ArrayList<>();
+	private final ArrayList<PropertyDocument> propertyList = new ArrayList<>();
 	private int counter = 0;
 
 //	private static Set<ItemIdValue> getNeighbours(ItemDocument country) {
@@ -89,11 +89,10 @@ public class SharedBordersQuestion implements QuestionType {
 		}
 	}
 
-	private Set<ItemIdValue> getQualifierIds(Statement s) {
-		Set<ItemIdValue> result;
-		result = new HashSet<>();
+	private static Set<ItemIdValue> getQualifierIds(Statement s) {
+		Set<ItemIdValue> result = new HashSet<>();
 		for (SnakGroup snakGroup : s.getQualifiers()) {
-			if (snakGroup.getProperty().getId().equals("P2308")) {
+			if (snakGroup.getProperty().getId().equals(PROPERTY_CLASS_CONSTRAINT)) {
 				for (Snak snak : snakGroup.getSnaks()) {
 					if (snak instanceof ValueSnak) {
 						Value snakValue = ((ValueSnak) snak).getValue();
@@ -196,17 +195,9 @@ public class SharedBordersQuestion implements QuestionType {
 
 		private PropertyDocument getRandomProperty(ItemDocument item) {
 			PropertyDocument property ;
-			boolean found = false;
 			do {
 				property = properties.get(RANDOM.nextInt(items.size()-1));
-				for (StatementGroup sg : item.getStatementGroups()) {
-					if (!sg.getProperty().getId().equals(property.getEntityId().getId())) {
-						continue;
-					}
-					found = true;
-					break;
-				}
-			}while (found);
+			} while (item.findStatementGroup(property.getEntityId()) == null);
 			return property;
 		}
 

@@ -26,11 +26,11 @@ public class Main {
 		switch (argument) {
 			case "pokemon":
 				questionType = new SubclassOfQuestionType();
-				inputFileName = "reduced2.json.gz";
+				inputFileName = "reduced.json.gz";
 				break;
 			case "borders":
 				questionType = new SharedBordersQuestion();
-				inputFileName = "borders.json";
+				inputFileName = "reduced.json.gz";
 				break;
 			case "maerchen":
 				questionType = new FairyTaleCharacterQuestionType();
