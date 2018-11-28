@@ -16,7 +16,7 @@ public class SharedBordersQuestion implements QuestionType {
 	private static final Random RANDOM = new Random();
 	private static final String PROPERTY_CLASS_CONSTRAINT = "P2308";
 	private final Map<String, ItemDocument> itemMap = new HashMap<>();
-	private final ArrayList<PropertyDocument> propertyList = new ArrayList<>();
+	private final Map<String, String> propertyMap = new HashMap<>();
 
 	private int counter = 0;
 
@@ -53,10 +53,8 @@ public class SharedBordersQuestion implements QuestionType {
 					}
 				}
 				if (typeConstraint != null && valueConstraint != null) {
-//					Set<ItemIdValue> intersection = SetUtils.intersection(typeConstraint, valueConstraint);
-//					if (!intersection.isEmpty()) {
-					if (typeConstraint.equals(valueConstraint)){
-						propertyList.add(propertyDocument);
+					if (typeConstraint.equals(valueConstraint) && propertyDocument.findLabel("de") != null){
+						propertyMap.put(propertyDocument.getEntityId().getId(),propertyDocument.findLabel("de"));
 					}
 				}
 			}
@@ -86,13 +84,11 @@ public class SharedBordersQuestion implements QuestionType {
 			return;
 		}
 		for (StatementGroup sg : itemDocument.getStatementGroups()) {
-			for (PropertyDocument propertyDocument : propertyList) {
-				if (!sg.getProperty().getId().equals(propertyDocument.getEntityId().getId())) {
-					continue;
-				}
-				itemMap.put(itemDocument.getEntityId().getId(),itemDocument);
-				return;
+			if (!propertyMap.containsKey(sg.getProperty().getId())) {
+				continue;
 			}
+			itemMap.put(itemDocument.getEntityId().getId(),itemDocument);
+			return;
 		}
 	}
 
@@ -129,23 +125,22 @@ public class SharedBordersQuestion implements QuestionType {
 //		c.transitiveNeighbors.removeIf(n -> n.equals(c.id));
 //	}
 
-
 	private class QuestionSupplier implements Supplier<Question> {
 		private final List<ItemDocument> items;
-		private final List<PropertyDocument> properties;
+		private final List<String> properties;
 
 		QuestionSupplier(ArrayList<ItemDocument> items) {
 			this.items = new ArrayList<>(items);
-			this.properties = new ArrayList<>(propertyList);
+			this.properties = new ArrayList<>(propertyMap.keySet());
 		}
 
 		@Override
 		public Question get() {
 			final ItemDocument item = items.get(RANDOM.nextInt(items.size()));
-			final PropertyDocument property = getRandomProperty(item);
+			final String property = getRandomProperty(item);
 
 			String correctAnswer =
-					item.findStatementGroup(property.getEntityId().getId()).getSubject().getId();
+					item.findStatementGroup(property).getSubject().getId();
 //					findCountryById(Iterators.get(country.adjacentCountries.iterator(), country.adjacentCountries.size() - 1)).orElseThrow(
 //					IllegalStateException::new).name;
 
@@ -167,12 +162,12 @@ public class SharedBordersQuestion implements QuestionType {
 			return new Question(text, answers);
 		}
 
-		private PropertyDocument getRandomProperty(ItemDocument item) {
-			PropertyDocument property ;
+		private String getRandomProperty(ItemDocument item) {
+			String propertyID ;
 			do {
-				property = properties.get(RANDOM.nextInt(items.size()-1));
-			} while (item.findStatementGroup(property.getEntityId()) == null);
-			return property;
+				propertyID = properties.get(RANDOM.nextInt(items.size()-1));
+			} while (item.findStatementGroup(propertyID) == null);
+			return propertyID;
 		}
 
 	}

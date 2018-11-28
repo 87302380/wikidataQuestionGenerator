@@ -30,7 +30,7 @@ public class Main {
 				break;
 			case "borders":
 				questionType = new SharedBordersQuestion();
-				inputFileName = "reduced.json.gz";
+				inputFileName = "reduced2.json.gz";
 				break;
 			case "maerchen":
 				questionType = new FairyTaleCharacterQuestionType();
