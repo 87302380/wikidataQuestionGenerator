@@ -1,7 +1,7 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest;
 
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
-import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.FairyTaleCharacterQuestionType;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.CharacterInWorkQuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.QuestionType;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SharedBordersQuestion;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.questions.SubclassOfQuestionType;
@@ -41,8 +41,8 @@ public class Main {
 				inputFileName = "borders.json";
 				break;
 			case "maerchen":
-				questionType = new FairyTaleCharacterQuestionType();
-				inputFileName = "maerchen.json";
+				questionType = new CharacterInWorkQuestionType();
+				inputFileName = "reducedwithproperties.json.gz";
 				break;
 			default:
 				throw new IllegalArgumentException("Bitte Argument übergeben!");

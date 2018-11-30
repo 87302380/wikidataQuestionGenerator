@@ -14,31 +14,21 @@ import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
+public class CharacterInWorkQuestionType implements QuestionType {
 
-public class FairyTaleCharacterQuestionType implements QuestionType {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(FairyTaleCharacterQuestionType.class);
+//	private static final Logger LOGGER = LoggerFactory.getLogger(CharacterInWorkQuestionType.class);
 //	private static final String PROPERTY_PRESENT_IN_WORK = "P1441";
 	private static final String PROPERTY_GENRE = "P136";
 	private static final String PROPERTY_CHARACTERS = "P674";
 	private int counter = 0;
 
 	private static final Map<String, Set<String>> workToCharacter = new HashMap<>();
+	private static final Map<String, Set<String>> workType = new HashMap<>();
 	private static final Map<String, String> workLabel = new HashMap<>();
 	private static final Map<String, String> charactersLabel = new HashMap<>();
-	private static final Set<String> work = new HashSet<>();
-	private static final Set<String> genreProperty = new HashSet<>();
 
-	public FairyTaleCharacterQuestionType() {
+	public CharacterInWorkQuestionType() {
 
-		addGenreProperty("Q699");
-		addGenreProperty("Q7832362");
-		addGenreProperty("Q20730955");
-
-	}
-	private void addGenreProperty(String fairyEntity){
-		genreProperty.add(fairyEntity);             //add need Work
 	}
 
 
@@ -69,35 +59,39 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 
 		}else if (counter == 1){
 
-			boolean isNeedWork = false;
-
 			for (StatementGroup sg : itemDocument.getStatementGroups()) {
 				if (sg.getProperty().getId().equals(PROPERTY_GENRE)) {
-					for (Statement s : sg.getStatements()) {
+                    workLabel.put(itemDocument.getEntityId().getId(),itemDocument.getLabels().get("de").getText());
+                    for (Statement s : sg.getStatements()) {
                         ItemIdValue itemIdValue = (ItemIdValue) s.getValue();
                         if (itemIdValue!=null){
                             String  genre = itemIdValue.getId();
-                            if (genreProperty.contains(genre)) {
-                                isNeedWork = true;
-                            }
+                            if (workType.get(genre)==null){
+								Set<String> work = new HashSet<>();
+								work.add(itemId);
+								workType.put(genre,work);
+							}else {
+								Set<String> work = workType.get(genre);
+								work.add(itemId);
+							}
                         }
 					}
 
 				}
 			}
 			for (StatementGroup sg : itemDocument.getStatementGroups()){
-				if (sg.getProperty().getId().equals(PROPERTY_CHARACTERS)&&isNeedWork)	{
-
-					workLabel.put(itemDocument.getEntityId().getId(),itemDocument.getLabels().get("de").getText());
+				if (sg.getProperty().getId().equals(PROPERTY_CHARACTERS))	{
 
 					Set<String> characters = new HashSet<>();
 
 					for (Statement s : sg.getStatements()) {
-						String character = ((ItemIdValue)s.getValue()).getId();
-						characters.add(character);
-						charactersLabel.put(character,null);
+                        ItemIdValue character = ((ItemIdValue)s.getValue());
+                        if (character!=null) {
+                            characters.add(character.getId());
+                            charactersLabel.put(character.getId(), null);
+                            workToCharacter.put(itemId,characters);
+                        }
 					}
-					workToCharacter.put(itemId,characters);
 
 				}
 			}
@@ -129,37 +123,60 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 
 		private Question getQuestion() {
 
-			String fairyTaleInQuestion = randomFairyTale();
-			List<String> answers = generateAnswers(fairyTaleInQuestion);
-
+			String correctAnswer = getCorrectAnswer();
+            System.out.println(correctAnswer);
+			List<String> answers = generateAnswers(correctAnswer);
 			answers = idToLabel(answers, workLabel);
 
-			String character = getRandomElement(workToCharacter.get(fairyTaleInQuestion));
+			String character = getRandomElement(workToCharacter.get(correctAnswer));
 			String text ;
 			if (charactersLabel.get(character)!=null){
-				text = charactersLabel.get(character) + " kommt aus welchen folgenden Märchen?";
+				text = charactersLabel.get(character) + " kommt aus welchen folgenden Werken?";
 			}else {
-				text = character + " kommt aus welchen folgenden Märchen?";
+				text = character + " kommt aus welchen folgenden Werken?";
 			}
 			return new Question(text, ImmutableList.copyOf(answers));
 		}
 
-		private String randomFairyTale() {
-			String[] FairyTale = workToCharacter.keySet().toArray(new String[0]);
-			return FairyTale[RANDOM.nextInt(FairyTale.length)];
+		private String randomAnswer(){
+            String[] work = workToCharacter.keySet().toArray(new String[0]);
+            return work[RANDOM.nextInt(work.length)];
+        }
+
+		private String getCorrectAnswer(){
+			String correctAnswer = randomAnswer();
+			while (true){
+			    if (workType.containsKey(getWorkType(correctAnswer))){
+                    if (workType.get(getWorkType(correctAnswer)).size()>=4){
+                        break;
+                    }else {
+                        correctAnswer = randomAnswer();
+                    }
+                }else {
+                    correctAnswer = randomAnswer();
+                }
+
+			}
+            return correctAnswer;
+		}
+
+		private String getWorkType(String value){
+			for (String key:workType.keySet()){
+				if (workType.get(key).contains(value)){
+					return key;
+				}
+			}
+			return null;
 		}
 
 		private ImmutableList<String> generateAnswers(String correctAnswer) {
-
+			String type = getWorkType(correctAnswer);
 			Set<String> allAnswers = new HashSet<>(4);
-
-			allAnswers.add(correctAnswer); 			// add the correct answer
-			while (allAnswers.size() < 4) {
-
-				String randomFairyTales = randomFairyTale();
-				if (!randomFairyTales.equals(correctAnswer)){
-					allAnswers.add(randomFairyTales);
-				}
+			Set<String> allTheTypeWork = workType.get(type);
+			allAnswers.add(correctAnswer);
+			while (allAnswers.size() < 4 ) {
+				String work = getRandomElement(allTheTypeWork);
+				allAnswers.add(work);
 			}
 
 			ImmutableList.Builder<String> answers = new Builder<>();
@@ -169,7 +186,17 @@ public class FairyTaleCharacterQuestionType implements QuestionType {
 		}
 
 		private static List<String> idToLabel(List<String> list, Map<String, String> map) {
-			return list.stream().map(map::get).peek(e -> Objects.requireNonNull(e, "no label for " + e)).collect(toList());
+			//return list.stream().map(map::get).collect(toList());
+            List<String> finished = new ArrayList<>();
+            for (String id : list) {
+                if (map.containsKey(id)) {
+                    String label = map.get(id);
+                    finished.add(label);
+                } else {
+                    finished.add(id);
+                }
+            }
+			return finished;
 		}
 		private static <E> E getRandomElement(Set<E> set){
 			int rn = (int) (Math.random() * (set.size()));
