@@ -2,9 +2,8 @@ package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.Iterators;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
 import org.wikidata.wdtk.datamodel.interfaces.Statement;
@@ -12,6 +11,8 @@ import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
 
 
 import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class CharacterInWorkQuestionType implements QuestionType {
@@ -46,7 +47,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 
 		QuestionGenerator questionGenerator = new QuestionGenerator();
 
-		return Stream.generate(questionGenerator::getQuestion);
+		return Stream.generate(questionGenerator);
 	}
 
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
@@ -98,7 +99,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 		}
 	}
 
-	private static class QuestionGenerator {
+	private static class QuestionGenerator implements Supplier<Question> {
 
 		private static final Random RANDOM = new Random();
 
@@ -121,7 +122,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 //			return Arrays.stream(lines).map(line -> line.split(",")).collect(groupingBy(parts -> parts[0], mapping(parts -> parts[1], toList())));
 //		}
 
-		private Question getQuestion() {
+		public Question get() {
 
 			String correctAnswer = getCorrectAnswer();
             System.out.println(correctAnswer);
@@ -138,12 +139,11 @@ public class CharacterInWorkQuestionType implements QuestionType {
 			return new Question(text, ImmutableList.copyOf(answers));
 		}
 
-		private String randomAnswer(){
-            String[] work = workToCharacter.keySet().toArray(new String[0]);
-            return work[RANDOM.nextInt(work.length)];
+		private static String randomAnswer(){
+			return getRandomElement(workToCharacter.keySet());
         }
 
-		private String getCorrectAnswer(){
+		private static String getCorrectAnswer(){
 			String correctAnswer = randomAnswer();
 			while (true){
 			    if (workType.containsKey(getWorkType(correctAnswer))){
@@ -160,16 +160,16 @@ public class CharacterInWorkQuestionType implements QuestionType {
             return correctAnswer;
 		}
 
-		private String getWorkType(String value){
-			for (String key:workType.keySet()){
-				if (workType.get(key).contains(value)){
-					return key;
+		private static String getWorkType(String value){
+			for (Entry<String, Set<String>> entry : workType.entrySet()){
+				if (entry.getValue().contains(value)){
+					return entry.getKey();
 				}
 			}
 			return null;
 		}
 
-		private ImmutableList<String> generateAnswers(String correctAnswer) {
+		private static ImmutableList<String> generateAnswers(String correctAnswer) {
 			String type = getWorkType(correctAnswer);
 			Set<String> allAnswers = new HashSet<>(4);
 			Set<String> allTheTypeWork = workType.get(type);
@@ -186,7 +186,6 @@ public class CharacterInWorkQuestionType implements QuestionType {
 		}
 
 		private static List<String> idToLabel(List<String> list, Map<String, String> map) {
-			//return list.stream().map(map::get).collect(toList());
             List<String> finished = new ArrayList<>();
             for (String id : list) {
                 if (map.containsKey(id)) {
@@ -198,16 +197,10 @@ public class CharacterInWorkQuestionType implements QuestionType {
             }
 			return finished;
 		}
+
 		private static <E> E getRandomElement(Set<E> set){
-			int rn = (int) (Math.random() * (set.size()));
-			int i = 0;
-			for (E e : set) {
-				if(i==rn){
-					return e;
-				}
-				i++;
-			}
-			return null;
+			int idx = RANDOM.nextInt(set.size());
+			return Iterators.get(set.iterator(), idx);
 		}
 	}
 
