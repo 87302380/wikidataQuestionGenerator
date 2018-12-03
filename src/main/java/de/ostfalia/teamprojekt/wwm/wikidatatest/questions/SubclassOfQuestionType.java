@@ -27,7 +27,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
 
 public class SubclassOfQuestionType implements QuestionType {
 
@@ -142,6 +141,24 @@ public class SubclassOfQuestionType implements QuestionType {
 	}
 
 
+
+
+	public static class Category {
+		private final Set<SubCategory> subCategories = new HashSet<>();
+		private ItemDocument itemDocument;
+	}
+
+
+
+
+	public static class SubCategory {
+		private final Set<String> instances = new HashSet<>();
+		private ItemDocument itemDocument;
+	}
+
+
+
+
 	public class SubclassOfQuestionSupplier implements Supplier<Question> {
 		private final List<Category> categoryList;
 
@@ -173,7 +190,7 @@ public class SubclassOfQuestionType implements QuestionType {
 				correctAnswer = correctAnswers.get(RANDOM.nextInt(correctAnswers.size()));
 
 				String subCategoryLabel = randomSubCategory.itemDocument.findLabel("de");
-				if (correctAnswer.contains(subCategoryLabel)) {
+				if (correctAnswer.toLowerCase().contains(subCategoryLabel.toLowerCase())) {
 					continue;
 				}
 
@@ -205,21 +222,5 @@ public class SubclassOfQuestionType implements QuestionType {
 			ImmutableList<String> answers = ImmutableList.<String>builder().add(correctAnswer).addAll(wrongAnswers).build();
 			return new Question(text, answers);
 		}
-	}
-
-
-
-
-	public static class Category {
-		private final Set<SubCategory> subCategories = new HashSet<>();
-		private ItemDocument itemDocument;
-	}
-
-
-
-
-	public static class SubCategory {
-		private final Set<String> instances = new HashSet<>();
-		private ItemDocument itemDocument;
 	}
 }
