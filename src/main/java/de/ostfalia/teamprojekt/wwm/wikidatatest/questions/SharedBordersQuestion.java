@@ -87,6 +87,7 @@ public class SharedBordersQuestion implements QuestionType {
 			if (!propertyMap.containsKey(sg.getProperty().getId())) {
 				continue;
 			}
+
 			itemMap.put(itemDocument.getEntityId().getId(),itemDocument);
 			return;
 		}
@@ -141,8 +142,6 @@ public class SharedBordersQuestion implements QuestionType {
 
 			String correctAnswer =
 					item.findStatementGroup(property).getSubject().getId();
-//					findCountryById(Iterators.get(country.adjacentCountries.iterator(), country.adjacentCountries.size() - 1)).orElseThrow(
-//					IllegalStateException::new).name;
 
 			String text = item.getEntityId() + " grenzt an " + "... ?";
 
