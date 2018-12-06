@@ -1,6 +1,7 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ public class SubclassOfQuestionType implements QuestionType {
 
 	private Map<String, Category> categories = new HashMap<>();
 	private Map<ItemIdValue, SubCategory> subCategoriesById;
+	private Map<Integer, Integer> itemCountByNumberOfStatements = new HashMap<>();
 	private int numberOfDumpReading = 0;
 
 	public SubclassOfQuestionType() { }
@@ -50,6 +52,7 @@ public class SubclassOfQuestionType implements QuestionType {
 		numberOfDumpReading++;
 		LOGGER.info("Dump reading nr. {}", numberOfDumpReading);
 		if (numberOfDumpReading == 2) {
+			LOGGER.info("{}", itemCountByNumberOfStatements);
 			subCategoriesById = categories.values().stream()
 					.flatMap(c -> c.subCategories.stream())
 					.collect(toMap(sc -> sc.itemDocument.getEntityId(), Function.identity(), (sc1, sc2) -> sc1));
@@ -84,6 +87,10 @@ public class SubclassOfQuestionType implements QuestionType {
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
 
 		if (numberOfDumpReading == 1) {
+			int numberOfStatements = Iterators.size(itemDocument.getAllStatements());
+			Integer count = itemCountByNumberOfStatements.getOrDefault(numberOfStatements, 0);
+			itemCountByNumberOfStatements.put(numberOfStatements, count + 1);
+
 			// find things that have the property "subclass of"
 			for (StatementGroup sg : itemDocument.getStatementGroups()) {
 				if (sg.getProperty().getId().equals(PROPERTY_SUBCLASS_OF)) {
