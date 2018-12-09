@@ -28,10 +28,6 @@ public class CharacterInWorkQuestionType implements QuestionType {
 	private static final Map<String, String> workLabel = new HashMap<>();
 	private static final Map<String, String> charactersLabel = new HashMap<>();
 
-	public CharacterInWorkQuestionType() {
-
-	}
-
 
 	@Override
 	public void onStartDumpReading() {
@@ -52,10 +48,18 @@ public class CharacterInWorkQuestionType implements QuestionType {
 
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
 		String itemId = itemDocument.getEntityId().getId();
+
 		if (counter == 2){
 			if (charactersLabel.containsKey(itemId)){
-				String characterName = itemDocument.getLabels().get("de").getText();
-				charactersLabel.put(itemId,characterName);
+				String character = itemDocument.getLabels().get("de").getText();
+				int count = 0 ;
+				Iterator iterator = itemDocument.getAllStatements();
+				while (iterator.hasNext()){
+					iterator.next();
+					count++;
+				}
+				character = character+","+count;
+				charactersLabel.put(itemId,character);
 			}
 
 		}else if (counter == 1){
@@ -104,35 +108,17 @@ public class CharacterInWorkQuestionType implements QuestionType {
 		private static final Random RANDOM = new Random();
 
 
-//		/**
-//		 * Convert lines of a csv file to a map of all key-value-pairs.
-//		 * <p>
-//		 * Example:
-//		 * <pre>
-//		 *     String[] lines = {"a,1", "b,3", "a,2"};
-//		 *     Map&lt;String, List&lt;String&gt;&gt; m = mapGenerator(lines);
-//		 * </pre>
-//		 * m will contain the mappings "a" -> ["1", "2"] and "b" -> ["3"].
-//		 *
-//		 * @param lines the lines of a csv file with 2 columns
-//		 *
-//		 * @return a mapping of every value in the first column to all values of the right column that occur on the same line.
-//		 */
-//		private static Map<String, List<String>> mapGenerator(String[] lines) {
-//			return Arrays.stream(lines).map(line -> line.split(",")).collect(groupingBy(parts -> parts[0], mapping(parts -> parts[1], toList())));
-//		}
-
 		public Question get() {
 
 			String correctAnswer = getCorrectAnswer();
-            System.out.println(correctAnswer);
 			List<String> answers = generateAnswers(correctAnswer);
 			answers = idToLabel(answers, workLabel);
 
 			String character = getRandomElement(workToCharacter.get(correctAnswer));
 			String text ;
 			if (charactersLabel.get(character)!=null){
-				text = charactersLabel.get(character) + " kommt aus welchen folgenden Werken?";
+				String characters[] = charactersLabel.get(character).split(",");
+				text = characters[0] + " kommt aus welchen folgenden Werken?";
 			}else {
 				text = character + " kommt aus welchen folgenden Werken?";
 			}
