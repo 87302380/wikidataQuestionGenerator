@@ -23,6 +23,9 @@ public class DifficultyCalculator implements EntityDocumentProcessor {
 	}
 
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
+		if (cumulativeCount != null) {
+			LOGGER.error("processItemDocument called after getDifficulty, ignoring the item.");
+		}
 		totalNumberOfItems++;
 		int numberOfStatements = Iterators.size(itemDocument.getAllStatements());
 		Integer count = itemCountByNumberOfStatements.getOrDefault(numberOfStatements, 0);
