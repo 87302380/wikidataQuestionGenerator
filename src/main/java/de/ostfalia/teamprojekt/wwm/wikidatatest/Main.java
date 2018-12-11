@@ -75,7 +75,7 @@ public class Main {
 		Scanner in = new Scanner(System.in);
 
 		do {
-			Pair<List<Question>, Stream<Question>> pair = takeN(questions, 200);
+			Pair<List<Question>, Stream<Question>> pair = takeN(questions, 500);
 			questions = pair.getRight();
 			pair.getLeft().forEach(System.out::println);
 			System.out.println("PRINT MORE QUESTIONS? [Y/n]");

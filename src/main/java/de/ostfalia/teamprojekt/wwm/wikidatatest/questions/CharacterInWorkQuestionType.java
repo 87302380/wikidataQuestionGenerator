@@ -122,7 +122,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 			}else {
 				text = character + " kommt aus welchen folgenden Werken?";
 			}
-			return new Question(text, ImmutableList.copyOf(answers));
+			return new Question(text, ImmutableList.copyOf(answers), 1);
 		}
 
 		private static String randomAnswer(){

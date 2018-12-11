@@ -191,7 +191,7 @@ public class SharedBordersQuestion implements QuestionType {
 					.collect(toList());*/
 
 			ImmutableList<String> answers = ImmutableList.<String>builder().add(correctAnswer)/*.addAll(wrongAnswers)*/.build();
-			return new Question(text, answers);
+			return new Question(text, answers, 1);
 		}
 
 		private PropertyDocument getRandomProperty(ItemDocument item) {

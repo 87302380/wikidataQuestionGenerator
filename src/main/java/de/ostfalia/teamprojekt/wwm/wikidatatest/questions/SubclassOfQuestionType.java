@@ -2,6 +2,7 @@ package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.DifficultyCalculator;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +40,8 @@ public class SubclassOfQuestionType implements QuestionType {
 
 	private Map<String, Category> categories = new HashMap<>();
 	private Map<ItemIdValue, SubCategory> subCategoriesById;
-	private Map<Integer, Integer> itemCountByNumberOfStatements = new HashMap<>();
 	private int numberOfDumpReading = 0;
+	private DifficultyCalculator difficultyCalculator = new DifficultyCalculator(15);
 
 	public SubclassOfQuestionType() { }
 
@@ -52,7 +53,6 @@ public class SubclassOfQuestionType implements QuestionType {
 		numberOfDumpReading++;
 		LOGGER.info("Dump reading nr. {}", numberOfDumpReading);
 		if (numberOfDumpReading == 2) {
-			LOGGER.info("{}", itemCountByNumberOfStatements);
 			subCategoriesById = categories.values().stream()
 					.flatMap(c -> c.subCategories.stream())
 					.collect(toMap(sc -> sc.itemDocument.getEntityId(), Function.identity(), (sc1, sc2) -> sc1));
@@ -87,10 +87,6 @@ public class SubclassOfQuestionType implements QuestionType {
 	@Override public void processItemDocument(final ItemDocument itemDocument) {
 
 		if (numberOfDumpReading == 1) {
-			int numberOfStatements = Iterators.size(itemDocument.getAllStatements());
-			Integer count = itemCountByNumberOfStatements.getOrDefault(numberOfStatements, 0);
-			itemCountByNumberOfStatements.put(numberOfStatements, count + 1);
-
 			// find things that have the property "subclass of"
 			for (StatementGroup sg : itemDocument.getStatementGroups()) {
 				if (sg.getProperty().getId().equals(PROPERTY_SUBCLASS_OF)) {
@@ -128,7 +124,11 @@ public class SubclassOfQuestionType implements QuestionType {
 							if (subCategory != null) {
 								String germanLabel = itemDocument.findLabel(LANGUAGE);
 								if (germanLabel != null) {
-									subCategory.instances.add(germanLabel);
+									Item i = new Item();
+									i.label = germanLabel;
+									i.numberOfStatements = Iterators.size(itemDocument.getAllStatements());
+									subCategory.instances.add(i);
+									difficultyCalculator.processItemDocument(itemDocument);
 								}
 							}
 						}
@@ -159,10 +159,15 @@ public class SubclassOfQuestionType implements QuestionType {
 
 
 	public static class SubCategory {
-		private final Set<String> instances = new HashSet<>();
+		private final Set<Item> instances = new HashSet<>();
 		private ItemDocument itemDocument;
 	}
 
+
+	public static class Item {
+		String label;
+		int numberOfStatements;
+	}
 
 
 
@@ -177,10 +182,6 @@ public class SubclassOfQuestionType implements QuestionType {
 		}
 
 		@Override public Question get() {
-			String text;
-			String correctAnswer;
-			List<String> wrongAnswers;
-
 			do {
 				Category randomCategory = categoryList.get(RANDOM.nextInt(categoryList.size()));
 				List<SubCategory> subCategories = new ArrayList<>(randomCategory.subCategories);
@@ -189,28 +190,30 @@ public class SubclassOfQuestionType implements QuestionType {
 				}
 
 				SubCategory randomSubCategory = subCategories.get(RANDOM.nextInt(subCategories.size()));
-				List<String> correctAnswers = new ArrayList<>(randomSubCategory.instances);
+				List<Item> correctAnswers = new ArrayList<>(randomSubCategory.instances);
 				if (correctAnswers.isEmpty()) {
 					continue;
 				}
 
-				correctAnswer = correctAnswers.get(RANDOM.nextInt(correctAnswers.size()));
+				Item correctAnswer = correctAnswers.get(RANDOM.nextInt(correctAnswers.size()));
 
 				String subCategoryLabel = randomSubCategory.itemDocument.findLabel("de");
-				if (correctAnswer.toLowerCase().contains(subCategoryLabel.toLowerCase())) {
+				if (correctAnswer.label.toLowerCase().contains(subCategoryLabel.toLowerCase())) {
 					continue;
 				}
 
-				text = "Welches ist ein " + subCategoryLabel + "?";
+				String text = "Welches ist ein " + subCategoryLabel + "?";
 
-				final String finalCorrectAnswer = correctAnswer;
+				final String finalCorrectAnswerLabel = correctAnswer.label;
 				List<String> allWrongAnswers = subCategories.stream()
 						.filter(c -> c != randomSubCategory)
 						.flatMap(c -> c.instances.stream())
-						.filter(a -> !a.equals(finalCorrectAnswer))
+						.map(i -> i.label)
+						.filter(l -> !l.equals(finalCorrectAnswerLabel))
 						.distinct()
 						.collect(toList());
 
+				List<String> wrongAnswers;
 				if (allWrongAnswers.size() < 3) {
 					continue;
 				} else if (allWrongAnswers.size() == 3) {
@@ -222,12 +225,12 @@ public class SubclassOfQuestionType implements QuestionType {
 							.mapToObj(allWrongAnswers::get)
 							.collect(toList());
 				}
-				break;
+
+				ImmutableList<String> answers = ImmutableList.<String>builder().add(correctAnswer.label).addAll(wrongAnswers).build();
+				int difficulty = difficultyCalculator.getDifficulty(correctAnswer.numberOfStatements);
+				return new Question(text, answers, difficulty);
 
 			} while (true);
-
-			ImmutableList<String> answers = ImmutableList.<String>builder().add(correctAnswer).addAll(wrongAnswers).build();
-			return new Question(text, answers);
 		}
 	}
 }
