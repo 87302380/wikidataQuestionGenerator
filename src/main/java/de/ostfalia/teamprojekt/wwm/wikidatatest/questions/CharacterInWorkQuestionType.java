@@ -3,6 +3,7 @@ package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterators;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.DifficultyCalculator;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
@@ -27,7 +28,9 @@ public class CharacterInWorkQuestionType implements QuestionType {
 	private static final Map<String, Set<String>> workType = new HashMap<>();
 	private static final Map<String, String> workLabel = new HashMap<>();
 	private static final Map<String, String> charactersLabel = new HashMap<>();
+	private DifficultyCalculator difficultyCalculator = new DifficultyCalculator(15);
 
+	static CharacterInWorkQuestionType workInQuestion = new CharacterInWorkQuestionType();
 
 	@Override
 	public void onStartDumpReading() {
@@ -60,6 +63,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 				}
 				character = character+","+count;
 				charactersLabel.put(itemId,character);
+				workInQuestion.difficultyCalculator.processItemDocument(itemDocument);
 			}
 
 		}else if (counter == 1){
@@ -107,7 +111,6 @@ public class CharacterInWorkQuestionType implements QuestionType {
 
 		private static final Random RANDOM = new Random();
 
-
 		public Question get() {
 
 			String correctAnswer = getCorrectAnswer();
@@ -116,13 +119,16 @@ public class CharacterInWorkQuestionType implements QuestionType {
 
 			String character = getRandomElement(workToCharacter.get(correctAnswer));
 			String text ;
+			int difficulty = 1;
 			if (charactersLabel.get(character)!=null){
 				String characters[] = charactersLabel.get(character).split(",");
 				text = characters[0] + " kommt aus welchen folgenden Werken?";
+				difficulty = workInQuestion.difficultyCalculator.getDifficulty(Integer.valueOf(characters[1]));
 			}else {
 				text = character + " kommt aus welchen folgenden Werken?";
 			}
-			return new Question(text, ImmutableList.copyOf(answers), 1);
+
+			return new Question(text, ImmutableList.copyOf(answers), difficulty);
 		}
 
 		private static String randomAnswer(){
