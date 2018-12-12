@@ -42,7 +42,7 @@ public class Main {
 				break;
 			case "maerchen":
 				questionType = new CharacterInWorkQuestionType();
-				inputFileName = "reducedwithproperties.json.gz";
+				inputFileName = "reduced.json.gz";
 				break;
 			default:
 				throw new IllegalArgumentException("Bitte Argument übergeben!");

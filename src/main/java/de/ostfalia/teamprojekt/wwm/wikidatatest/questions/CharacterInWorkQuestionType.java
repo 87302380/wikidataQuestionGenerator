@@ -22,15 +22,15 @@ public class CharacterInWorkQuestionType implements QuestionType {
 //	private static final String PROPERTY_PRESENT_IN_WORK = "P1441";
 	private static final String PROPERTY_GENRE = "P136";
 	private static final String PROPERTY_CHARACTERS = "P674";
+	private static final Random RANDOM = new Random();
+
 	private int counter = 0;
 
-	private static final Map<String, Set<String>> workToCharacter = new HashMap<>();
-	private static final Map<String, Set<String>> workType = new HashMap<>();
-	private static final Map<String, String> workLabel = new HashMap<>();
-	private static final Map<String, String> charactersLabel = new HashMap<>();
-	private DifficultyCalculator difficultyCalculator = new DifficultyCalculator(15);
-
-	static CharacterInWorkQuestionType workInQuestion = new CharacterInWorkQuestionType();
+	private final Map<String, Set<String>> workToCharacter = new HashMap<>();
+	private final Map<String, Set<String>> workType = new HashMap<>();
+	private final Map<String, String> workLabel = new HashMap<>();
+	private final Map<String, String> charactersLabel = new HashMap<>();
+	private final DifficultyCalculator difficultyCalculator = new DifficultyCalculator(15);
 
 	@Override
 	public void onStartDumpReading() {
@@ -63,7 +63,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 				}
 				character = character+","+count;
 				charactersLabel.put(itemId,character);
-				workInQuestion.difficultyCalculator.processItemDocument(itemDocument);
+				difficultyCalculator.processItemDocument(itemDocument);
 			}
 
 		}else if (counter == 1){
@@ -107,9 +107,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 		}
 	}
 
-	private static class QuestionGenerator implements Supplier<Question> {
-
-		private static final Random RANDOM = new Random();
+	private class QuestionGenerator implements Supplier<Question> {
 
 		public Question get() {
 
@@ -123,7 +121,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 			if (charactersLabel.get(character)!=null){
 				String characters[] = charactersLabel.get(character).split(",");
 				text = characters[0] + " kommt aus welchen folgenden Werken?";
-				difficulty = workInQuestion.difficultyCalculator.getDifficulty(Integer.valueOf(characters[1]));
+				difficulty = difficultyCalculator.getDifficulty(Integer.valueOf(characters[1]));
 			}else {
 				text = character + " kommt aus welchen folgenden Werken?";
 			}
@@ -131,11 +129,11 @@ public class CharacterInWorkQuestionType implements QuestionType {
 			return new Question(text, ImmutableList.copyOf(answers), difficulty);
 		}
 
-		private static String randomAnswer(){
+		private String randomAnswer(){
 			return getRandomElement(workToCharacter.keySet());
         }
 
-		private static String getCorrectAnswer(){
+		private String getCorrectAnswer(){
 			String correctAnswer = randomAnswer();
 			while (true){
 			    if (workType.containsKey(getWorkType(correctAnswer))){
@@ -152,7 +150,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
             return correctAnswer;
 		}
 
-		private static String getWorkType(String value){
+		private String getWorkType(String value){
 			for (Entry<String, Set<String>> entry : workType.entrySet()){
 				if (entry.getValue().contains(value)){
 					return entry.getKey();
@@ -161,7 +159,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 			return null;
 		}
 
-		private static ImmutableList<String> generateAnswers(String correctAnswer) {
+		private ImmutableList<String> generateAnswers(String correctAnswer) {
 			String type = getWorkType(correctAnswer);
 			Set<String> allAnswers = new HashSet<>(4);
 			Set<String> allTheTypeWork = workType.get(type);
@@ -177,7 +175,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 			return answers.build();
 		}
 
-		private static List<String> idToLabel(List<String> list, Map<String, String> map) {
+		private List<String> idToLabel(List<String> list, Map<String, String> map) {
             List<String> finished = new ArrayList<>();
             for (String id : list) {
                 if (map.containsKey(id)) {
@@ -190,7 +188,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 			return finished;
 		}
 
-		private static <E> E getRandomElement(Set<E> set){
+		private <E> E getRandomElement(Set<E> set){
 			int idx = RANDOM.nextInt(set.size());
 			return Iterators.get(set.iterator(), idx);
 		}
