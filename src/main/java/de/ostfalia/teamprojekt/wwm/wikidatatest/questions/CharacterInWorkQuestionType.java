@@ -120,10 +120,10 @@ public class CharacterInWorkQuestionType implements QuestionType {
 			int difficulty = 1;
 			if (charactersLabel.get(character)!=null){
 				String characters[] = charactersLabel.get(character).split(",");
-				text = characters[0] + " kommt aus welchen folgenden Werken?";
+				text = "Aus welchem Werk kommt " + characters[0] + "?";
 				difficulty = difficultyCalculator.getDifficulty(Integer.valueOf(characters[1]));
 			}else {
-				text = character + " kommt aus welchen folgenden Werken?";
+				text = "Aus welchem Werk kommt " + character + "?";
 			}
 
 			return new Question(text, ImmutableList.copyOf(answers), difficulty);
