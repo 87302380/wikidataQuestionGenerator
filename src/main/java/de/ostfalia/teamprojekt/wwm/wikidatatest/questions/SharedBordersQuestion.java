@@ -1,6 +1,8 @@
 package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
+import de.ostfalia.teamprojekt.wwm.wikidatatest.DifficultyCalculator;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,7 @@ public class SharedBordersQuestion implements QuestionType {
 	private static final String ITEM_VALUE_TYPE_CONSTRAINT = "Q21510865";
 	private static final Random RANDOM = new Random();
 	private static final String PROPERTY_CLASS_CONSTRAINT = "P2308";
+	private final DifficultyCalculator difficultyCalculator = new DifficultyCalculator(15);
 	private final Map<String, ItemDocument> itemMap = new HashMap<>();
 	private final Map<String, String> propertyMap = new HashMap<>();
 	private final Map<String, Integer> counterMap = new HashMap<>();
@@ -114,7 +117,7 @@ public class SharedBordersQuestion implements QuestionType {
 		LOGGER.info("{} {}",counterMap,propertyMap.values());
 		ArrayList<ItemDocument> items = new ArrayList<>(itemMap.values());
 		for (ItemDocument value : itemMap.values()) {
-			
+			difficultyCalculator.registerStatementCount(Iterators.size(value.getAllStatements()));
 		}
 		return Stream.generate(new QuestionSupplier(items));
 	}
@@ -187,7 +190,8 @@ public class SharedBordersQuestion implements QuestionType {
 				}
 				ItemDocument correctAnswer = correctAnswers.size() == 1 ? correctAnswers.get(0): correctAnswers.get(RANDOM.nextInt(correctAnswers.size() - 1));
 				ImmutableList<String> answers = ImmutableList.<String>builder().add(correctAnswer.findLabel("de")).addAll(wrongAnswers).build();
-				return new Question(text, answers);
+				int difficulty=difficultyCalculator.getDifficulty(Iterators.size(item.getAllStatements()));
+				return new Question(text, answers,difficulty);
 			} while (true);
 		}
 
