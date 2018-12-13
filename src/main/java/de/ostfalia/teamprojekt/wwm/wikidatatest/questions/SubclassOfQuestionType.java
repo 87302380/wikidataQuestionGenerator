@@ -37,11 +37,10 @@ public class SubclassOfQuestionType implements QuestionType {
 	private static final String PROPERTY_SUBCLASS_OF = "P279";
 	private static final Random RANDOM = new Random();
 	private static final String LANGUAGE = "de";
-
+	private final DifficultyCalculator difficultyCalculator = new DifficultyCalculator(15);
 	private Map<String, Category> categories = new HashMap<>();
 	private Map<ItemIdValue, SubCategory> subCategoriesById;
 	private int numberOfDumpReading = 0;
-	private DifficultyCalculator difficultyCalculator = new DifficultyCalculator(15);
 
 	public SubclassOfQuestionType() { }
 
@@ -53,8 +52,8 @@ public class SubclassOfQuestionType implements QuestionType {
 		numberOfDumpReading++;
 		LOGGER.info("Dump reading nr. {}", numberOfDumpReading);
 		if (numberOfDumpReading == 2) {
-			subCategoriesById = categories.values().stream()
-					.flatMap(c -> c.subCategories.stream())
+			subCategoriesById = categories.values().parallelStream()
+					.flatMap(c -> c.subCategories.parallelStream())
 					.collect(toMap(sc -> sc.itemDocument.getEntityId(), Function.identity(), (sc1, sc2) -> sc1));
 		} else if (numberOfDumpReading == 3) {
 			LOGGER.info("found {} categories", categories.size());
@@ -80,6 +79,12 @@ public class SubclassOfQuestionType implements QuestionType {
 			}
 		}
 		LOGGER.info("{} of those have at least one non-empty subcategory", categories.size());
+
+		categories.values()
+				.stream()
+				.flatMap(c -> c.subCategories.stream())
+				.flatMap(s -> s.instances.stream())
+				.forEach(i -> difficultyCalculator.registerStatementCount(i.numberOfStatements));
 
 		return Stream.generate(new SubclassOfQuestionSupplier());
 	}
@@ -128,7 +133,6 @@ public class SubclassOfQuestionType implements QuestionType {
 									i.label = germanLabel;
 									i.numberOfStatements = Iterators.size(itemDocument.getAllStatements());
 									subCategory.instances.add(i);
-									difficultyCalculator.processItemDocument(itemDocument);
 								}
 							}
 						}
@@ -148,11 +152,13 @@ public class SubclassOfQuestionType implements QuestionType {
 	}
 
 
-
-
 	public static class Category {
 		private final Set<SubCategory> subCategories = new HashSet<>();
 		private ItemDocument itemDocument;
+
+		private Stream<Item> allItems() {
+			return subCategories.stream().flatMap(s -> s.instances.stream());
+		}
 	}
 
 
@@ -164,10 +170,13 @@ public class SubclassOfQuestionType implements QuestionType {
 	}
 
 
+
+
 	public static class Item {
 		String label;
 		int numberOfStatements;
 	}
+
 
 
 

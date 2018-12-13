@@ -63,7 +63,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 				}
 				character = character+","+count;
 				charactersLabel.put(itemId,character);
-				difficultyCalculator.processItemDocument(itemDocument);
+				difficultyCalculator.registerStatementCount(Iterators.size(itemDocument.getAllStatements()));
 			}
 
 		}else if (counter == 1){
