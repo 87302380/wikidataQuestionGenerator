@@ -2,21 +2,30 @@ package de.ostfalia.teamprojekt.wwm.wikidatatest.questions;
 
 import com.google.common.collect.ImmutableList;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wikidata.wdtk.datamodel.interfaces.*;
+
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 
 public class SharedBordersQuestion implements QuestionType {
 
 	private static final String PROPERTY_CONSTRAINT = "P2302";
+	private static final Logger LOGGER = LoggerFactory.getLogger(SharedBordersQuestion.class);
 	private static final String ITEM_TYPE_CONSTRAINT = "Q21503250";
 	private static final String ITEM_VALUE_TYPE_CONSTRAINT = "Q21510865";
 	private static final Random RANDOM = new Random();
 	private static final String PROPERTY_CLASS_CONSTRAINT = "P2308";
 	private final Map<String, ItemDocument> itemMap = new HashMap<>();
 	private final Map<String, String> propertyMap = new HashMap<>();
+	private final Map<String, Integer> counterMap = new HashMap<>();
 
 	private int counter = 0;
 
@@ -52,10 +61,8 @@ public class SharedBordersQuestion implements QuestionType {
 						}
 					}
 				}
-				if (typeConstraint != null && valueConstraint != null) {
-					if (typeConstraint.equals(valueConstraint) && propertyDocument.findLabel("de") != null){
-						propertyMap.put(propertyDocument.getEntityId().getId(),propertyDocument.findLabel("de"));
-					}
+				if (typeConstraint != null && typeConstraint.equals(valueConstraint) && propertyDocument.findLabel("de") != null) {
+					propertyMap.put(propertyDocument.getEntityId().getId(), propertyDocument.findLabel("de"));
 				}
 			}
 		}
@@ -88,85 +95,103 @@ public class SharedBordersQuestion implements QuestionType {
 				continue;
 			}
 
-			itemMap.put(itemDocument.getEntityId().getId(),itemDocument);
+			itemMap.put(itemDocument.getEntityId().getId(), itemDocument);
+			if (counterMap.containsKey(sg.getProperty().getId())){
+				counterMap.put(sg.getProperty().getId(),counterMap.get(sg.getProperty().getId())+1);
+			} else {
+				counterMap.put(sg.getProperty().getId(),1);
+			}
 			return;
 		}
 	}
 
 	@Override
 	public Stream<Question> generateQuestions() {
+		LOGGER.info("{} {}",counterMap,propertyMap.values());
 		ArrayList<ItemDocument> items = new ArrayList<>(itemMap.values());
-//		// not in the dump, but neighbor of another country (eg greenland, soviet union)
-//		Set<ItemIdValue> invalidCountryIds = new HashSet<>();
-//		for (Iterator<Country> iterator = countries.iterator(); iterator.hasNext(); ) {
-//			final Country country = iterator.next();
-//			if (country.itemDocument == null) {
-//				iterator.remove();
-//				invalidCountryIds.add(country.id);
-//			}
-//		}
-//		countries.forEach(c -> c.adjacentCountries.removeIf(invalidCountryIds::contains));
-//		for (Country country : countries) {
-//			calculateTransitiveNeighbors(country);
-//		}
+		for (ItemDocument value : itemMap.values()) {
+			
+		}
 		return Stream.generate(new QuestionSupplier(items));
 	}
 
-//	private void calculateTransitiveNeighbors(Country c) {
-//		for (ItemIdValue neighborId : c.adjacentCountries) {
-//			Optional<Country> neighbor = getCountryForId(neighborId);
-//			if (!neighbor.isPresent()) {
-//				// just created, is invalid
-//				continue;
-//			}
-//			Set<ItemIdValue> neighbourNeighbours = getNeighbours(neighbor.get().itemDocument);
-//			neighbourNeighbours.removeIf(c.adjacentCountries::contains);
-//			c.transitiveNeighbors.addAll(neighbourNeighbours);
-//		}
-//		c.transitiveNeighbors.removeIf(n -> n.equals(c.id));
-//	}
+
+	private List<ItemDocument> getAnswerList(String id, String prop) {
+		ItemDocument obj = itemMap.get(id);
+		ArrayList<ItemDocument> answers = new ArrayList<>();
+		if (obj == null) {
+			return Collections.emptyList();
+		}
+		StatementGroup sg = obj.findStatementGroup(prop);
+		if (sg == null){
+			return Collections.emptyList();
+		}
+		for (Statement statement : sg) {
+			if (!(statement.getValue() instanceof ItemIdValue)) {
+				continue;
+			}
+			String answer = ((ItemIdValue) statement.getValue()).getId();
+			ItemDocument getAnswer = itemMap.get(answer);
+			if (getAnswer == null) {
+				continue;
+			}
+			answers.add(getAnswer);
+		}
+		return answers;
+	}
 
 	private class QuestionSupplier implements Supplier<Question> {
 		private final List<ItemDocument> items;
-		private final List<String> properties;
 
 		QuestionSupplier(ArrayList<ItemDocument> items) {
 			this.items = new ArrayList<>(items);
-			this.properties = new ArrayList<>(propertyMap.keySet());
 		}
 
 		@Override
 		public Question get() {
-			final ItemDocument item = items.get(RANDOM.nextInt(items.size()));
-			final String property = getRandomProperty(item);
+			do {
+				final ItemDocument item = items.get(RANDOM.nextInt(items.size()));
+				final String property = getRandomProperty(item);
 
-			String correctAnswer =
-					item.findStatementGroup(property).getSubject().getId();
+				List<ItemDocument> correctAnswers = getAnswerList(item.getEntityId().getId(), property);
+				if (correctAnswers.isEmpty()){
+					LOGGER.warn("{} hat keine Werte für {}",item.findLabel("de"),property );
+					continue;
+				}
+				String text = item.findLabel("de") + " " + propertyMap.get(property) + "... ?";
 
-			String text = item.getEntityId() + " grenzt an " + "... ?";
+				Set<ItemDocument> transitiveAnswers = new HashSet<>();
+				for (ItemDocument answer : correctAnswers) {
+					transitiveAnswers.addAll(getAnswerList(answer.getEntityId().getId(), property));
+				}
 
-			/*List<ItemIdValue> transitiveNeighbors = new ArrayList<>(country.transitiveNeighbors);
-
-			List<String> wrongAnswers = RANDOM.ints(0, transitiveNeighbors.size())
-					.distinct()
-					.mapToObj(transitiveNeighbors::get)
-					.map(this::findCountryById)
-					.filter(Optional::isPresent)
-					.map(Optional::get)
-					.limit(3)
-					.map(c -> c.name)
-					.collect(toList());*/
-
-			ImmutableList<String> answers = ImmutableList.<String>builder().add(correctAnswer)/*.addAll(wrongAnswers)*/.build();
-			return new Question(text, answers);
+				transitiveAnswers.removeAll(correctAnswers);
+				if (transitiveAnswers.size() < 3) {
+					continue;
+				}
+				List<String> wrongAnswers;
+				if (transitiveAnswers.size() == 3){
+					wrongAnswers = transitiveAnswers.stream().map(itemDocument -> itemDocument.findLabel("de")).collect(toList());
+				}else {
+					List<ItemDocument> trans= new ArrayList<>(transitiveAnswers);
+					wrongAnswers = RANDOM.ints(0, trans.size())
+							.mapToObj(trans::get)
+							.distinct()
+							.limit(3)
+							.map(itemDocument -> itemDocument.findLabel("de"))
+							.collect(toList());
+				}
+				ItemDocument correctAnswer = correctAnswers.size() == 1 ? correctAnswers.get(0): correctAnswers.get(RANDOM.nextInt(correctAnswers.size() - 1));
+				ImmutableList<String> answers = ImmutableList.<String>builder().add(correctAnswer.findLabel("de")).addAll(wrongAnswers).build();
+				return new Question(text, answers);
+			} while (true);
 		}
 
 		private String getRandomProperty(ItemDocument item) {
-			String propertyID ;
-			do {
-				propertyID = properties.get(RANDOM.nextInt(items.size()-1));
-			} while (item.findStatementGroup(propertyID) == null);
-			return propertyID;
+			Set<String> itemProperties = item.getStatementGroups().stream().map(sg -> sg.getProperty().getId()).collect(toSet());
+			itemProperties.retainAll(propertyMap.keySet());
+			List<String> list = new ArrayList<>(itemProperties);
+			return list.get(RANDOM.nextInt(list.size()));
 		}
 
 	}
