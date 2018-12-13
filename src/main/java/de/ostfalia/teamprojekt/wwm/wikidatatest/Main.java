@@ -38,7 +38,7 @@ public class Main {
 				break;
 			case "borders":
 				questionType = new SharedBordersQuestion();
-				inputFileName = "borders.json";
+				inputFileName = "reduced2.json.gz";
 				break;
 			case "maerchen":
 				questionType = new CharacterInWorkQuestionType();

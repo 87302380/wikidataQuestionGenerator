@@ -33,8 +33,11 @@ public class LanguageFilter implements EntityDocumentProcessor {
 		}
 	}
 
-	@Override public void processPropertyDocument(final PropertyDocument propertyDocument) {
-		next.processPropertyDocument(propertyDocument);
+	@Override public void processPropertyDocument(PropertyDocument propertyDocument) {
+		propertyDocument = datamodelFilter.filter(propertyDocument);
+		if (propertyDocument.findLabel(LANGUAGE) != null) {
+			next.processPropertyDocument(propertyDocument);
+		}
 	}
 
 	@Override public void processLexemeDocument(final LexemeDocument lexemeDocument) {

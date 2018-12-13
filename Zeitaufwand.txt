@@ -1,3 +1,2 @@
 Jendrik: 95
-Marcel:  50
-
+Marcel:  65
