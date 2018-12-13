@@ -1,2 +1,2 @@
-Jendrik: 95
+Jendrik: 100
 Marcel:  65
