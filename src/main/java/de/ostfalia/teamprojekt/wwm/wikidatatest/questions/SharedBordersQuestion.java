@@ -6,16 +6,30 @@ import de.ostfalia.teamprojekt.wwm.wikidatatest.DifficultyCalculator;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wikidata.wdtk.datamodel.interfaces.*;
+import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
+import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
+import org.wikidata.wdtk.datamodel.interfaces.PropertyDocument;
+import org.wikidata.wdtk.datamodel.interfaces.Snak;
+import org.wikidata.wdtk.datamodel.interfaces.SnakGroup;
+import org.wikidata.wdtk.datamodel.interfaces.Statement;
+import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
+import org.wikidata.wdtk.datamodel.interfaces.Value;
+import org.wikidata.wdtk.datamodel.interfaces.ValueSnak;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-
 
 
 public class SharedBordersQuestion implements QuestionType {
@@ -34,17 +48,47 @@ public class SharedBordersQuestion implements QuestionType {
 	private int counter = 0;
 
 	@Override
-	public void onStartDumpReading() {
-		counter++;
-	}
-
-	@Override
 	public boolean canGenerateQuestions() {
 		return counter == 2;
 	}
 
 	@Override
+	public void onStartDumpReading() {
+		counter++;
+	}
 
+	@Override
+	public Stream<Question> generateQuestions(Optional<Integer> difficulty) {
+		LOGGER.info("{} {}", counterMap, propertyMap.values());
+		ArrayList<ItemDocument> items = new ArrayList<>(itemMap.values());
+		for (ItemDocument value : itemMap.values()) {
+			difficultyCalculator.registerStatementCount(Iterators.size(value.getAllStatements()));
+		}
+		return Stream.generate(new QuestionSupplier(items));
+	}
+
+	@Override
+	public void processItemDocument(ItemDocument itemDocument) {
+		if (counter == 1) {
+			return;
+		}
+		for (StatementGroup sg : itemDocument.getStatementGroups()) {
+			if (!propertyMap.containsKey(sg.getProperty().getId())) {
+				continue;
+			}
+
+			itemMap.put(itemDocument.getEntityId().getId(), itemDocument);
+			if (counterMap.containsKey(sg.getProperty().getId())) {
+				counterMap.put(sg.getProperty().getId(), counterMap.get(sg.getProperty().getId()) + 1);
+			} else {
+				counterMap.put(sg.getProperty().getId(), 1);
+			}
+			return;
+
+		}
+	}
+
+	@Override
 	public void processPropertyDocument(PropertyDocument propertyDocument) {
 		if (counter == 2) {
 			return;
@@ -91,38 +135,6 @@ public class SharedBordersQuestion implements QuestionType {
 		return result;
 	}
 
-	@Override
-	public void processItemDocument(ItemDocument itemDocument) {
-		if (counter == 1) {
-			return;
-		}
-		for (StatementGroup sg : itemDocument.getStatementGroups()) {
-			if (!propertyMap.containsKey(sg.getProperty().getId())) {
-				continue;
-			}
-
-			itemMap.put(itemDocument.getEntityId().getId(), itemDocument);
-			if (counterMap.containsKey(sg.getProperty().getId())){
-				counterMap.put(sg.getProperty().getId(),counterMap.get(sg.getProperty().getId())+1);
-			} else {
-				counterMap.put(sg.getProperty().getId(),1);
-			}
-			return;
-
-		}
-	}
-
-	@Override
-	public Stream<Question> generateQuestions() {
-		LOGGER.info("{} {}",counterMap,propertyMap.values());
-		ArrayList<ItemDocument> items = new ArrayList<>(itemMap.values());
-		for (ItemDocument value : itemMap.values()) {
-			difficultyCalculator.registerStatementCount(Iterators.size(value.getAllStatements()));
-		}
-		return Stream.generate(new QuestionSupplier(items));
-	}
-
-
 	private List<ItemDocument> getAnswerList(String id, String prop) {
 		ItemDocument obj = itemMap.get(id);
 		ArrayList<ItemDocument> answers = new ArrayList<>();
@@ -130,7 +142,7 @@ public class SharedBordersQuestion implements QuestionType {
 			return Collections.emptyList();
 		}
 		StatementGroup sg = obj.findStatementGroup(prop);
-		if (sg == null){
+		if (sg == null) {
 			return Collections.emptyList();
 		}
 		for (Statement statement : sg) {
@@ -161,8 +173,8 @@ public class SharedBordersQuestion implements QuestionType {
 				final String property = getRandomProperty(item);
 
 				List<ItemDocument> correctAnswers = getAnswerList(item.getEntityId().getId(), property);
-				if (correctAnswers.isEmpty()){
-					LOGGER.warn("{} hat keine Werte für {}",item.findLabel("de"),property );
+				if (correctAnswers.isEmpty()) {
+					LOGGER.warn("{} hat keine Werte für {}", item.findLabel("de"), property);
 					continue;
 				}
 				String text = item.findLabel("de") + " " + propertyMap.get(property) + "... ?";
@@ -177,10 +189,10 @@ public class SharedBordersQuestion implements QuestionType {
 					continue;
 				}
 				List<String> wrongAnswers;
-				if (transitiveAnswers.size() == 3){
+				if (transitiveAnswers.size() == 3) {
 					wrongAnswers = transitiveAnswers.stream().map(itemDocument -> itemDocument.findLabel("de")).collect(toList());
-				}else {
-					List<ItemDocument> trans= new ArrayList<>(transitiveAnswers);
+				} else {
+					List<ItemDocument> trans = new ArrayList<>(transitiveAnswers);
 					wrongAnswers = RANDOM.ints(0, trans.size())
 							.mapToObj(trans::get)
 							.distinct()
@@ -188,10 +200,10 @@ public class SharedBordersQuestion implements QuestionType {
 							.map(itemDocument -> itemDocument.findLabel("de"))
 							.collect(toList());
 				}
-				ItemDocument correctAnswer = correctAnswers.size() == 1 ? correctAnswers.get(0): correctAnswers.get(RANDOM.nextInt(correctAnswers.size() - 1));
+				ItemDocument correctAnswer = correctAnswers.size() == 1 ? correctAnswers.get(0) : correctAnswers.get(RANDOM.nextInt(correctAnswers.size() - 1));
 				ImmutableList<String> answers = ImmutableList.<String>builder().add(correctAnswer.findLabel("de")).addAll(wrongAnswers).build();
-				int difficulty=difficultyCalculator.getDifficulty(Iterators.size(item.getAllStatements()));
-				return new Question(text, answers,difficulty);
+				int difficulty = difficultyCalculator.getDifficulty(Iterators.size(item.getAllStatements()));
+				return new Question(text, answers, difficulty);
 			} while (true);
 		}
 

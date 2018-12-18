@@ -42,7 +42,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 		return counter == 2;
 	}
 
-	@Override public Stream<Question> generateQuestions() {
+	@Override public Stream<Question> generateQuestions(Optional<Integer> difficulty) {
 
 		QuestionGenerator questionGenerator = new QuestionGenerator();
 

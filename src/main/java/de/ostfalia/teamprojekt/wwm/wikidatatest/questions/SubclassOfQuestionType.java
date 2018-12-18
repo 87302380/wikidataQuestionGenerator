@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
@@ -70,21 +71,22 @@ public class SubclassOfQuestionType implements QuestionType {
 		}
 	}
 
-	@Override public Stream<Question> generateQuestions() {
-		for (Iterator<Category> iterator = categories.values().iterator(); iterator.hasNext(); ) {
-			final Category c = iterator.next();
-			c.subCategories.removeIf(sc -> sc.instances.size() == 0);
-			if (c.subCategories.isEmpty()) {
-				iterator.remove();
-			}
-		}
-		LOGGER.info("{} of those have at least one non-empty subcategory", categories.size());
-
+	@Override public Stream<Question> generateQuestions(Optional<Integer> difficulty) {
 		categories.values()
 				.stream()
 				.flatMap(c -> c.subCategories.stream())
 				.flatMap(s -> s.instances.stream())
 				.forEach(i -> difficultyCalculator.registerStatementCount(i.numberOfStatements));
+
+		for (Iterator<Category> categoriesIterator = categories.values().iterator(); categoriesIterator.hasNext(); ) {
+			final Category c = categoriesIterator.next();
+			c.subCategories.removeIf(sc -> sc.instances.isEmpty());
+
+			if (c.subCategories.isEmpty()) {
+				categoriesIterator.remove();
+			}
+		}
+
 
 		return Stream.generate(new SubclassOfQuestionSupplier());
 	}
