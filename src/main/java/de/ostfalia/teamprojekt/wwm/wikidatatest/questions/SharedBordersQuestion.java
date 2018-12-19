@@ -119,6 +119,9 @@ public class SharedBordersQuestion implements QuestionType {
 			itemMap.put(itemDocument.getEntityId().getId(), itemDocument);
 			if (counterMap.containsKey(sg.getProperty().getId())){
 				counterMap.put(sg.getProperty().getId(),counterMap.get(sg.getProperty().getId())+1);
+				for (ItemDocument doc : getAnswerList(itemDocument.getEntityId().getId(), sg.getProperty().getId())) {
+					toAdd.add(doc.getEntityId().getId());
+				}
 			} else {
 				counterMap.put(sg.getProperty().getId(),1);
 			}
