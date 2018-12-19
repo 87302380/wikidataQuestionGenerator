@@ -42,7 +42,6 @@ public class DifficultyCalculator {
 		numberOfItemsWithFewerStatements -= itemCountByNumberOfStatements.get(numberOfStatements);
 		double ratio = ((double) numberOfItemsWithFewerStatements) / totalNumberOfItems; // should be in range (0, 1]
 		// use reverse ratio (large number of statements -> small difficulty)
-		// prevent returning a value of zero by subtracting one and adding one at the end
 		int result = (int) Math.ceil((1 - ratio) * maxDifficultyValue);
 		LOGGER.info("calculated difficulty for {} statements: ratio={}, 1-ratio={}, (1-ratio)*maxDifficultyValue={}, difficulty={}", numberOfStatements, ratio, 1-ratio, (1-ratio)*maxDifficultyValue, result);
 		return result;
