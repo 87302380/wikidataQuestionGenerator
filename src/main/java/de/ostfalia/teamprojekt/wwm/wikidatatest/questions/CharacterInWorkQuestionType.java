@@ -61,7 +61,7 @@ public class CharacterInWorkQuestionType implements QuestionType {
 					iterator.next();
 					count++;
 				}
-				character = character+","+count;
+				character = character+"，"+count;
 				charactersLabel.put(itemId,character);
 				workInQuestion.difficultyCalculator.processItemDocument(itemDocument);
 			}
@@ -113,22 +113,22 @@ public class CharacterInWorkQuestionType implements QuestionType {
 
 		public Question get() {
 
-			String correctAnswer = getCorrectAnswer();
-			List<String> answers = generateAnswers(correctAnswer);
-			answers = idToLabel(answers, workLabel);
+			while (true){
+				String correctAnswer = getCorrectAnswer();
+				List<String> answers = generateAnswers(correctAnswer);
+				answers = idToLabel(answers, workLabel);
 
-			String character = getRandomElement(workToCharacter.get(correctAnswer));
-			String text ;
-			int difficulty = 1;
-			if (charactersLabel.get(character)!=null){
-				String characters[] = charactersLabel.get(character).split(",");
-				text = characters[0] + " kommt aus welchen folgenden Werken?";
-				difficulty = workInQuestion.difficultyCalculator.getDifficulty(Integer.valueOf(characters[1]));
-			}else {
-				text = character + " kommt aus welchen folgenden Werken?";
+				String character = getRandomElement(workToCharacter.get(correctAnswer));
+				String text ;
+				int difficulty = 1;
+				if (charactersLabel.get(character)!=null){
+					String characters[] = charactersLabel.get(character).split("，");
+					text = characters[0] + " kommt aus welchen folgenden Werken?";
+					difficulty = workInQuestion.difficultyCalculator.getDifficulty(Integer.valueOf(characters[1]));
+					return new Question(text, ImmutableList.copyOf(answers), difficulty);
+				}
 			}
 
-			return new Question(text, ImmutableList.copyOf(answers), difficulty);
 		}
 
 		private static String randomAnswer(){
