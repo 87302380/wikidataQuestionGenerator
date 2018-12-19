@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
@@ -37,11 +38,10 @@ public class SubclassOfQuestionType implements QuestionType {
 	private static final String PROPERTY_SUBCLASS_OF = "P279";
 	private static final Random RANDOM = new Random();
 	private static final String LANGUAGE = "de";
-
+	private final DifficultyCalculator difficultyCalculator = new DifficultyCalculator(15);
 	private Map<String, Category> categories = new HashMap<>();
 	private Map<ItemIdValue, SubCategory> subCategoriesById;
 	private int numberOfDumpReading = 0;
-	private DifficultyCalculator difficultyCalculator = new DifficultyCalculator(15);
 
 	public SubclassOfQuestionType() { }
 
@@ -53,8 +53,8 @@ public class SubclassOfQuestionType implements QuestionType {
 		numberOfDumpReading++;
 		LOGGER.info("Dump reading nr. {}", numberOfDumpReading);
 		if (numberOfDumpReading == 2) {
-			subCategoriesById = categories.values().stream()
-					.flatMap(c -> c.subCategories.stream())
+			subCategoriesById = categories.values().parallelStream()
+					.flatMap(c -> c.subCategories.parallelStream())
 					.collect(toMap(sc -> sc.itemDocument.getEntityId(), Function.identity(), (sc1, sc2) -> sc1));
 		} else if (numberOfDumpReading == 3) {
 			LOGGER.info("found {} categories", categories.size());
@@ -71,15 +71,22 @@ public class SubclassOfQuestionType implements QuestionType {
 		}
 	}
 
-	@Override public Stream<Question> generateQuestions() {
-		for (Iterator<Category> iterator = categories.values().iterator(); iterator.hasNext(); ) {
-			final Category c = iterator.next();
-			c.subCategories.removeIf(sc -> sc.instances.size() == 0);
+	@Override public Stream<Question> generateQuestions(Optional<Integer> difficulty) {
+		categories.values()
+				.stream()
+				.flatMap(c -> c.subCategories.stream())
+				.flatMap(s -> s.instances.stream())
+				.forEach(i -> difficultyCalculator.registerStatementCount(i.numberOfStatements));
+
+		for (Iterator<Category> categoriesIterator = categories.values().iterator(); categoriesIterator.hasNext(); ) {
+			final Category c = categoriesIterator.next();
+			c.subCategories.removeIf(sc -> sc.instances.isEmpty());
+
 			if (c.subCategories.isEmpty()) {
-				iterator.remove();
+				categoriesIterator.remove();
 			}
 		}
-		LOGGER.info("{} of those have at least one non-empty subcategory", categories.size());
+
 
 		return Stream.generate(new SubclassOfQuestionSupplier());
 	}
@@ -128,7 +135,6 @@ public class SubclassOfQuestionType implements QuestionType {
 									i.label = germanLabel;
 									i.numberOfStatements = Iterators.size(itemDocument.getAllStatements());
 									subCategory.instances.add(i);
-									difficultyCalculator.processItemDocument(itemDocument);
 								}
 							}
 						}
@@ -148,11 +154,13 @@ public class SubclassOfQuestionType implements QuestionType {
 	}
 
 
-
-
 	public static class Category {
 		private final Set<SubCategory> subCategories = new HashSet<>();
 		private ItemDocument itemDocument;
+
+		private Stream<Item> allItems() {
+			return subCategories.stream().flatMap(s -> s.instances.stream());
+		}
 	}
 
 
@@ -164,10 +172,13 @@ public class SubclassOfQuestionType implements QuestionType {
 	}
 
 
+
+
 	public static class Item {
 		String label;
 		int numberOfStatements;
 	}
+
 
 
 

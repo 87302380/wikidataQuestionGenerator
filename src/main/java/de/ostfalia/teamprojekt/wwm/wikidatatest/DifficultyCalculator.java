@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class DifficultyCalculator implements EntityDocumentProcessor {
+public class DifficultyCalculator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DifficultyCalculator.class);
 	private final SortedMap<Integer, Integer> itemCountByNumberOfStatements = new TreeMap<>();
@@ -22,14 +22,13 @@ public class DifficultyCalculator implements EntityDocumentProcessor {
 		this.maxDifficultyValue = maxDifficultyValue;
 	}
 
-	@Override public void processItemDocument(final ItemDocument itemDocument) {
+	public void registerStatementCount(final int statementCount) {
 		if (cumulativeCount != null) {
 			LOGGER.error("processItemDocument called after getDifficulty, ignoring the item.");
 		}
 		totalNumberOfItems++;
-		int numberOfStatements = Iterators.size(itemDocument.getAllStatements());
-		Integer count = itemCountByNumberOfStatements.getOrDefault(numberOfStatements, 0);
-		itemCountByNumberOfStatements.put(numberOfStatements, count + 1);
+		Integer count = itemCountByNumberOfStatements.getOrDefault(statementCount, 0);
+		itemCountByNumberOfStatements.put(statementCount, count + 1);
 	}
 
 	public int getDifficulty(int numberOfStatements) {
