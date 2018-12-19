@@ -6,30 +6,15 @@ import de.ostfalia.teamprojekt.wwm.wikidatatest.DifficultyCalculator;
 import de.ostfalia.teamprojekt.wwm.wikidatatest.model.Question;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
-import org.wikidata.wdtk.datamodel.interfaces.ItemIdValue;
-import org.wikidata.wdtk.datamodel.interfaces.PropertyDocument;
-import org.wikidata.wdtk.datamodel.interfaces.Snak;
-import org.wikidata.wdtk.datamodel.interfaces.SnakGroup;
-import org.wikidata.wdtk.datamodel.interfaces.Statement;
-import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
-import org.wikidata.wdtk.datamodel.interfaces.Value;
-import org.wikidata.wdtk.datamodel.interfaces.ValueSnak;
+import org.wikidata.wdtk.datamodel.interfaces.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+
 
 
 public class SharedBordersQuestion implements QuestionType {
@@ -44,6 +29,7 @@ public class SharedBordersQuestion implements QuestionType {
 	private final Map<String, ItemDocument> itemMap = new HashMap<>();
 	private final Map<String, String> propertyMap = new HashMap<>();
 	private final Map<String, Integer> counterMap = new HashMap<>();
+	private final List<String> toAdd = new ArrayList<>();
 
 	private int counter = 0;
 
@@ -67,32 +53,13 @@ public class SharedBordersQuestion implements QuestionType {
 		return Stream.generate(new QuestionSupplier(items));
 	}
 
-	@Override
-	public void processItemDocument(ItemDocument itemDocument) {
-		if (counter == 1) {
-			return;
-		}
-		for (StatementGroup sg : itemDocument.getStatementGroups()) {
-			if (!propertyMap.containsKey(sg.getProperty().getId())) {
-				continue;
-			}
-
-			itemMap.put(itemDocument.getEntityId().getId(), itemDocument);
-			if (counterMap.containsKey(sg.getProperty().getId())) {
-				counterMap.put(sg.getProperty().getId(), counterMap.get(sg.getProperty().getId()) + 1);
-			} else {
-				counterMap.put(sg.getProperty().getId(), 1);
-			}
-			return;
-
-		}
-	}
 
 	@Override
 	public void processPropertyDocument(PropertyDocument propertyDocument) {
-		if (counter == 2) {
+		if (counter == 3 || counter == 2) {
 			return;
 		}
+
 		for (StatementGroup sg : propertyDocument.getStatementGroups()) {
 			if (sg.getProperty().getId().equals(PROPERTY_CONSTRAINT)) {
 				Set<ItemIdValue> typeConstraint = null;
@@ -135,6 +102,31 @@ public class SharedBordersQuestion implements QuestionType {
 		return result;
 	}
 
+
+	@Override
+	public void processItemDocument(ItemDocument itemDocument) {
+		if (counter == 1) {
+			return;
+		}
+		if (counter == 3){
+			return;
+		}
+		for (StatementGroup sg : itemDocument.getStatementGroups()) {
+			if (!propertyMap.containsKey(sg.getProperty().getId())) {
+				continue;
+			}
+
+			itemMap.put(itemDocument.getEntityId().getId(), itemDocument);
+			if (counterMap.containsKey(sg.getProperty().getId())){
+				counterMap.put(sg.getProperty().getId(),counterMap.get(sg.getProperty().getId())+1);
+			} else {
+				counterMap.put(sg.getProperty().getId(),1);
+			}
+			return;
+
+		}
+	}
+
 	private List<ItemDocument> getAnswerList(String id, String prop) {
 		ItemDocument obj = itemMap.get(id);
 		ArrayList<ItemDocument> answers = new ArrayList<>();
@@ -173,8 +165,8 @@ public class SharedBordersQuestion implements QuestionType {
 				final String property = getRandomProperty(item);
 
 				List<ItemDocument> correctAnswers = getAnswerList(item.getEntityId().getId(), property);
-				if (correctAnswers.isEmpty()) {
-					LOGGER.warn("{} hat keine Werte für {}", item.findLabel("de"), property);
+				if (correctAnswers.isEmpty()){
+//					LOGGER.warn("{} hat keine Werte für {}",item.findLabel("de"),property );
 					continue;
 				}
 				String text = item.findLabel("de") + " " + propertyMap.get(property) + "... ?";
